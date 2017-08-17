@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Capstone</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="user_name">User Name</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="dont_have_reddit_account">If you don\'t have reddit account, please go to www.reddit.com and sign up.</string>
+    <string name="incorrect_credentials">Incorrect Login User Name or Password, Please check again.</string>
+    <string name="error_empty_username">Enter user name</string>
+    <string name="error_empty_password">Enter password</string>
+    <string name="reddit_connect">Connecting Reddit.</string>
+    <string name="login_success">Login Successfull</string>
+    <string name="title_activity_sub_reddits">SubRedditsActivity</string>
+    <string name="subreddits">SubReddits</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="done">Done</string>
+    <string name="title_activity_home_page">HomePageActivity</string>
 </resources>
