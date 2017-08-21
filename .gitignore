@@ -13,7 +13,7 @@
 .idea/vcs.xml
 Capstone/.idea/compiler.xml
 Capstone/.idea/copyright/profiles_settings.xml
-*.xml
+
 Capstone/local.properties
 Capstone/gradlew.bat
 Capstone/gradlew
@@ -24,3 +24,6 @@ Capstone/.idea/workspace.xml
 Capstone/.idea/modules.xml
 Capstone/.idea/misc.xml
 .idea/misc.xml
+Capstone/.idea/vcs.xml
+Capstone/.idea/runConfigurations.xml
+Capstone/.idea/gradle.xml

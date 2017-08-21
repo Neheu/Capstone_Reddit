@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBg">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        android:src="@mipmap/redit_icon" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="serif-monospace"
+        android:text="@string/app_name"
+        android:textColor="@color/colorBasicText"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_layout_username"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:clipToPadding="false"
+        android:gravity="bottom"
+        android:paddingTop="4dp"
+        app:errorEnabled="true"
+        app:hintTextAppearance="@style/Base.TextAppearance.AppCompat.Small"
+        android:textColorHint="@color/colorTxtHint">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/ed_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/horizontal_margin"
+            android:layout_marginRight="@dimen/horizontal_margin"
+            android:hint="@string/user_name"
+            android:textColor="@color/colorBasicText"
+          />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_layout_password"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:clipToPadding="false"
+        android:gravity="bottom"
+        android:paddingTop="4dp"
+        app:errorEnabled="true"
+        android:textColorHint="@color/colorTxtHint"
+        >
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/ed_user_password"
+            app:hintTextAppearance="@style/Base.TextAppearance.AppCompat.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/horizontal_margin"
+            android:layout_marginRight="@dimen/horizontal_margin"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:textColor="@color/colorBasicText"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_user_login"
+        android:layout_width="match_parent"
+        android:layout_marginRight="@dimen/horizontal_margin"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimary"
+        android:layout_marginTop="@dimen/horizontal_margin"
+        android:text="@string/done"
+        android:textColor="@color/colorBg" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linearLayout"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin"
+        android:layout_marginTop="18dp"
+        android:text="@string/dont_have_reddit_account"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/colorTxtHint"/>
+</LinearLayout>
+    </ScrollView>
