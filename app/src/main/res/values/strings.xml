@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">Capstone</string>
+    <string name="app_name">Ready-It</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="user_name">User Name</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
-    <string name="dont_have_reddit_account">If you don\'t have reddit account, please go to www.reddit.com and sign up.</string>
+    <string name="dont_have_reddit_account">If you don\'t have reddit account, please visit www.reddit.com and register.</string>
     <string name="incorrect_credentials">Incorrect Login User Name or Password, Please check again.</string>
     <string name="error_empty_username">Enter user name</string>
     <string name="error_empty_password">Enter password</string>

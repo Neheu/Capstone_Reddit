@@ -7,28 +7,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.utils.Constants;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,15 +37,25 @@ import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import static com.udacity.project.reddit.capstone.utils.Constants.ACCESS_TOKEN_URL;
+import static com.udacity.project.reddit.capstone.utils.Constants.REDIRECT_URI;
+import static com.udacity.project.reddit.capstone.utils.Constants.STATE;
 
 
-public class MainActivity extends AppCompatActivity implements
+public class LginActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<JSONObject> {
     private TextView txtReddit;
 
     @BindView(R.id.ed_user_name)
     TextInputEditText editTextUserName;
-
     @BindView(R.id.ed_user_password)
     TextInputEditText editTextPassword;
     @BindView(R.id.text_input_layout_username)
@@ -70,33 +74,55 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 //        new LoginAsync().execute();
         ButterKnife.bind(this);
         prefs = getSharedPreferences(Constants.PREFRENCE_NAME,MODE_PRIVATE);
+
         btnLoggin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 userName = editTextUserName.getText().toString();
                 userPasswd = editTextPassword.getText().toString();
 
-                if ("".equals(userName)) {
-                    textInputPassword.setError(null);
-                    textInputUserName.setError(getString(R.string.error_empty_username));
-                }
-                    else if ("".equals(userPasswd)) {
-                    textInputUserName.setError(null);
-                    textInputPassword.setError(getString(R.string.error_empty_password));
-                }
-                else {
-                    textInputUserName.setError(null);
-                    textInputPassword.setError(null);
-                    getLoaderManager().initLoader(0, null, MainActivity.this);
-                }
+//                if ("".equals(userName)) {
+//                    textInputPassword.setError(null);
+//                    textInputUserName.setError(getString(R.string.error_empty_username));
+//                }
+//                    else if ("".equals(userPasswd)) {
+//                    textInputUserName.setError(null);
+//                    textInputPassword.setError(getString(R.string.error_empty_password));
+//                }
+//                else {
+//                    textInputUserName.setError(null);
+//                    textInputPassword.setError(null);
+//                    getLoaderManager().initLoader(0, null, LginActivity.this);
+//                }
+                String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
             }
         });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        if(getIntent()!=null && getIntent().getAction()!=null)
+            if(getIntent().getAction().equals(Intent.ACTION_VIEW)) {
+            Uri uri = getIntent().getData();
+            if(uri.getQueryParameter("error") != null) {
+                String error = uri.getQueryParameter("error");
+                Log.e("LOGIN. ", "An error has occurred : " + error);
+            } else {
+                String state = uri.getQueryParameter("state");
+                if(state.equals(STATE)) {
+                    String code = uri.getQueryParameter("code");
+                    getAccessToken(code);
+                }
+            }
+        }
+    }
     @Override
     public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
         try {
@@ -106,7 +132,44 @@ public class MainActivity extends AppCompatActivity implements
         }
         return null;
     }
+    private void getAccessToken(String code) {
+        OkHttpClient client = new OkHttpClient();
+        String authString = Constants.CLIENT_ID + ":";
+        String encodedAuthString = Base64.encodeToString(authString.getBytes(),
+                Base64.NO_WRAP);
+        Request request = new Request.Builder()
+                .addHeader("User-Agent", "Sample App")
+                .addHeader("Authorization", "Basic " + encodedAuthString)
+                .url(ACCESS_TOKEN_URL)
+                .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"),
+                        "grant_type=authorization_code&code=" + code +
+                                "&redirect_uri=" + REDIRECT_URI))
+                .build();
 
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(">> ", "ERROR: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String json = response.body().string();
+
+                JSONObject data = null;
+                try {
+                    data = new JSONObject(json);
+                    String accessToken = data.optString("access_token");
+                    String refreshToken = data.optString("refresh_token");
+
+                    Log.d(">> ", "Access Token = " + accessToken);
+                    Log.d(">> ", "Refresh Token = " + refreshToken);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
     @Override
     public void onLoadFinished(Loader<JSONObject> loader, JSONObject data) {
         progressDialog.dismiss();
@@ -119,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements
                 editor = prefs.edit();
                 editor.putString(Constants.PREFRENCE_MODHASH, modhash);
                 editor.apply();
-                Toast.makeText(MainActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LginActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this,SubRedditsActivity.class));
                 finish();
 
@@ -130,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements
         else if (data.has("errors")) {
              editTextUserName.setText(userName);
              editTextPassword.setText(userPasswd);
-            Toast.makeText(MainActivity.this, getString(R.string.incorrect_credentials), Toast.LENGTH_SHORT).show();
+            Toast.makeText(LginActivity.this, getString(R.string.incorrect_credentials), Toast.LENGTH_SHORT).show();
         }
     }
 

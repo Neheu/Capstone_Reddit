@@ -14,6 +14,7 @@ import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
 import com.udacity.project.reddit.capstone.server.ApiClient;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
 
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -28,8 +29,9 @@ public class HomePageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        for (GetSubredditsModel.Data_ data: SubredditsAdapters.checkedList) {
-            connectApiClient(data.url+".json");
+
+        for (int i=0;i<SubredditsAdapters.checkedList.size();i++ ) {
+            connectApiClient(SubredditsAdapters.checkedList.get(i)+".json");
         }
 
     }

@@ -1,7 +1,9 @@
 package com.udacity.project.reddit.capstone.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,13 +32,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.http.GET;
 
-public class SubRedditsActivity extends AppCompatActivity {
+public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener{
     private ApiInterface apiInterface;
     private RecyclerView recycleViewSubreddit;
     private SubredditsAdapters adapter;
     @BindView(R.id.btn_done)
-    AppCompatButton btnDone;
+    FloatingActionButton btnDone;
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +47,6 @@ public class SubRedditsActivity extends AppCompatActivity {
 //         getSupportActionBar().setTitle(R.string.subreddits);
         ButterKnife.bind(this);
         recycleViewSubreddit = (RecyclerView) findViewById(R.id.rv_subreddit);
-        recycleViewSubreddit.setHasFixedSize(true);
         LinearLayoutManager gridLayoutManager = new LinearLayoutManager(this);
         recycleViewSubreddit.setLayoutManager(gridLayoutManager);
         //Connect to ReteoFit and get subreddits
@@ -53,8 +55,8 @@ public class SubRedditsActivity extends AppCompatActivity {
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (SubredditsAdapters.checkedList != null && SubredditsAdapters.checkedList.size() != 0)
-                    startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class));
+
+                startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class));
             }
         });
     }
@@ -78,7 +80,7 @@ public class SubRedditsActivity extends AppCompatActivity {
                     GetSubredditsModel.subredditDataList.add(data.data);
 
                 }
-                recycleViewSubreddit.setAdapter(new SubredditsAdapters(SubRedditsActivity.this, GetSubredditsModel.subredditDataList));
+                recycleViewSubreddit.setAdapter(new SubredditsAdapters(SubRedditsActivity.this, GetSubredditsModel.subredditDataList,SubRedditsActivity.this));
             }
 
             @Override
@@ -94,5 +96,14 @@ public class SubRedditsActivity extends AppCompatActivity {
 
         return super.onCreateOptionsMenu(menu);
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @Override
+    public void checkCount(int count) {
+        if(count>0)
+            btnDone.setVisibility(View.VISIBLE);
+        else
+            btnDone.setVisibility(View.GONE);
     }
 }

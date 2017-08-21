@@ -9,11 +9,13 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,13 +26,14 @@ public class SubredditsAdapters extends RecyclerView.Adapter<SubredditsAdapters.
 
     private List<GetSubredditsModel.Data_> resultDataList;
     private Context context;
-    public static List<GetSubredditsModel.Data_> checkedList = new ArrayList<>();
-    // private onMovieThumbClickHandler clickHandler;
+    private int count = 0;
+    public static HashMap<String,GetSubredditsModel.Data_> checkedList = new HashMap<>();
+    private checkChangeListener checkHandler;
 
-    public SubredditsAdapters(final Context actContext, final List<GetSubredditsModel.Data_> subredditDataList) {
+    public SubredditsAdapters(final Context actContext, final List<GetSubredditsModel.Data_> subredditDataList, checkChangeListener listener) {
         this.context = actContext;
         this.resultDataList = subredditDataList;
-        //this.clickHandler = handler;
+        this.checkHandler = listener;
     }
 
     @Override
@@ -40,8 +43,6 @@ public class SubredditsAdapters extends RecyclerView.Adapter<SubredditsAdapters.
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
         View layoutView = layoutInflater.inflate(layoutId, parent, shouldAttachToParentImmediately);
-        int height = parent.getMeasuredHeight() / 4;
-        layoutView.setMinimumHeight(height);
 
         return new SubredditsViewHolder(layoutView);
     }
@@ -55,18 +56,33 @@ public class SubredditsAdapters extends RecyclerView.Adapter<SubredditsAdapters.
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
+                        count++;
                         data.isSelected(true);
-                        holder.checkBox.setId(position);
-                        checkedList.add(resultDataList.get(position));
+
+                        checkedList.put(data.title,resultDataList.get(position));
+                        holder.checkBox.setId(resultDataList.size());
+                        checkHandler.checkCount(count);
+                        Toast.makeText(context,data.title+"added",Toast.LENGTH_LONG).show();
                     } else {
+                        count--;
                         data.isSelected(false);
-                        if (holder.checkBox.getId() == position)
-                            checkedList.remove(position);
+                        checkHandler.checkCount(count);
+                        for(String key: checkedList.keySet()) {
+                            if (key.equals(data.title)) {
+                                checkedList.remove(key);
+                                Toast.makeText(context, data.title + "removed", Toast.LENGTH_LONG).show();
+                                break;
+                            }
+                        }
                     }
                 }
             });
             holder.checkBox.setChecked(data.hasChecked);
         }
+    }
+
+    public interface checkChangeListener {
+        void checkCount(int count);
     }
 
 
@@ -85,7 +101,6 @@ public class SubredditsAdapters extends RecyclerView.Adapter<SubredditsAdapters.
             title = (TextView) itemView.findViewById(R.id.txt_subreddit_title);
             checkBox = (CheckBox) itemView.findViewById(R.id.cb_subreddit);
             itemView.setOnClickListener(this);
-//            checkBox.setClickable(false);
 
         }
 
