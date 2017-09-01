@@ -4,23 +4,22 @@ import com.google.common.primitives.Booleans;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Neha on 10-08-2017.
  */
 
 public class GetSubredditsModel {
 
-
-        @SerializedName("kind")
-        @Expose
-        public String kind;
-        @SerializedName("data")
-        @Expose
-        public Data data;
-
-
+    @SerializedName("kind")
+    @Expose
+    public String kind;
+    @SerializedName("data")
+    @Expose
+    public Data data;
 
     public class Data {
 
@@ -40,7 +39,8 @@ public class GetSubredditsModel {
 
     }
 
-    public  static  List<Data_> subredditDataList = new ArrayList<>();
+    public static List<Data_> subredditDataList = new ArrayList<>();
+
     public class Data_ {
 
         @SerializedName("banner_img")
@@ -215,14 +215,15 @@ public class GetSubredditsModel {
         @Expose
         public Object userIsSubscriber;
 
-
+        public boolean isSubscribed = false;
         //for chrckbox
-        public boolean hasChecked=false;
-        public void isSelected(boolean bol)
-        {
+        public boolean hasChecked = false;
+
+        public void isSelected(boolean bol) {
             hasChecked = bol;
         }
     }
+
     public class Kind {
 
         @SerializedName("kind")
@@ -233,6 +234,7 @@ public class GetSubredditsModel {
         public Data data;
 
     }
+
     public class Child {
 
         @SerializedName("kind")
@@ -244,6 +246,7 @@ public class GetSubredditsModel {
 
 
     }
+
 
 }
 

@@ -3,21 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/horizontal_margin"
-       >
+    android:padding="@dimen/horizontal_margin">
 
     <TextView
-        android:layout_weight="1"
         android:id="@+id/txt_subreddit_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="@color/colorBasicText"
-        android:text="Subreddits" />
+        android:layout_weight="1"
+        android:text="Subreddits"
+        android:textColor="@color/colorBasicText" />
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/cb_subreddit"
-        android:layout_gravity="center"
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/btn_switch"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/subscribe"
+        android:textColor="@color/colorAccent"
+        android:textSize="10sp" />
 </LinearLayout>

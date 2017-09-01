@@ -18,4 +18,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="done">Done</string>
     <string name="title_activity_home_page">HomePageActivity</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="unsubscribe">Unsubscribe</string>
+
 </resources>

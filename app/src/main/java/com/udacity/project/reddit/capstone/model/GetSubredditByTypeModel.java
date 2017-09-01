@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Neha on 14-08-2017.
  */
 
-public class GetSubredditByType {
+public class GetSubredditByTypeModel {
     @SerializedName("kind")
     @Expose
     private String kind;

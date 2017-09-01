@@ -6,13 +6,17 @@
     android:layout_height="match_parent"
     tools:context="com.udacity.project.reddit.capstone.activity.SubRedditsActivity">
 
-
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_subreddit"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         ></android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_done"
@@ -23,8 +27,8 @@
         android:layout_marginRight="@dimen/horizontal_margin"
         android:alpha="4"
         android:elevation="6dp"
-        android:src="@mipmap/ic_done"
-        android:visibility="gone" />
+        android:src="@mipmap/icon_check"
+        android:visibility="visible" />
 
 </FrameLayout>
 

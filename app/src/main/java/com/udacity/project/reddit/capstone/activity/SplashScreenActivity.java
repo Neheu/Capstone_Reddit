@@ -2,15 +2,10 @@ package com.udacity.project.reddit.capstone.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -79,12 +74,12 @@ public class SplashScreenActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-//                            SharedPreferences pref = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
-//                            if (pref != null && pref.contains(Constants.PREFRENCE_MODHASH))
-//                                startActivity(new Intent(SplashScreenActivity.this, SubRedditsActivity.class));
-//                            else
+                            SharedPreferences pref = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
+                            if (pref != null && pref.contains(Constants.PREFRENCE_TOKEN))
+                                startActivity(new Intent(SplashScreenActivity.this, SubRedditsActivity.class));
+                            else
 
-                                startActivity(new Intent(SplashScreenActivity.this, LginActivity.class));
+                                startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
                             finish();
                         }
                     });

@@ -1,21 +1,14 @@
 package com.udacity.project.reddit.capstone.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.adapters.SubredditsAdapters;
-import com.udacity.project.reddit.capstone.model.GetSubredditByType;
-import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
+import com.udacity.project.reddit.capstone.model.GetSubredditByTypeModel;
 import com.udacity.project.reddit.capstone.server.ApiClient;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
-
-import java.util.HashMap;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,7 +39,7 @@ public class HomePageActivity extends AppCompatActivity {
                         return;
                     }
                     //Get the response from api
-                    GetSubredditByType model = (GetSubredditByType) response.body();
+                    GetSubredditByTypeModel model = (GetSubredditByTypeModel) response.body();
 
                 }
 
