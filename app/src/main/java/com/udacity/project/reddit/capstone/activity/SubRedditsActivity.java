@@ -1,23 +1,16 @@
 package com.udacity.project.reddit.capstone.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 
@@ -35,19 +28,13 @@ import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 import com.udacity.project.reddit.capstone.utils.NetworkUtils;
 import com.udacity.project.reddit.capstone.utils.OnLoadMoreListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.internal.Utils;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -55,10 +42,6 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.GET;
-
-import static com.udacity.project.reddit.capstone.utils.Constants.ACCESS_TOKEN_URL;
-import static com.udacity.project.reddit.capstone.utils.Constants.REDIRECT_URI;
 
 public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SwipeRefreshLayout.OnRefreshListener {
     private ApiInterface apiInterface;
@@ -121,23 +104,22 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                for (Map.Entry<String, SubscribeRedditsViewModel> mapEntry : SubredditsAdapters.checkedList.entrySet()) {
-//                    String key = mapEntry.getKey();
-//                    SubscribeRedditsViewModel value = mapEntry.getValue();
-//                    dbHelper.updateSubscribeReddits(value);
-//                    if (value.hasChecked)
-//                        sub.add(value.display_name);
-//                    else
-//                        unsub.add(value.display_name);
-//
-//      }
-//                if (sub.size() > 0)
-//                    getAccessToken("sub", android.text.TextUtils.join(",", sub));
-//                if (unsub.size() > 0)
-//                    getAccessToken("unsub", android.text.TextUtils.join(",", unsub));
-                getAccessToken1();
+                for (Map.Entry<String, SubscribeRedditsViewModel> mapEntry : SubredditsAdapters.checkedList.entrySet()) {
+                    String key = mapEntry.getKey();
+                    SubscribeRedditsViewModel value = mapEntry.getValue();
+                    dbHelper.updateSubscribeReddits(value);
+                    if (value.hasChecked)
+                        sub.add(value.display_name);
+                    else
+                        unsub.add(value.display_name);
 
-                //
+      }
+                if (sub.size() > 0)
+                    requestForSubredditSubscription("sub", android.text.TextUtils.join(",", sub));
+//                if (unsub.size() > 0)
+//                    requestForSubredditSubscription("unsub", android.text.TextUtils.join(",", unsub));
+
+
             }
         });
         adapters.setOnLoadMoreListener(new OnLoadMoreListener() {
@@ -253,7 +235,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    private void getAccessToken(String action, String name) {
+    private void requestForSubredditSubscription(String action, String name) {
         OkHttpClient client = new OkHttpClient();
         String encodedAuthString = preferences.getString(Constants.PREFRENCE_TOKEN, "");
 
@@ -290,7 +272,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
             }
         });
     }
-    private void getAccessToken1() {
+    private void getMySubscribedSubreddits() {
         OkHttpClient client = new OkHttpClient();
         String token = preferences.getString(Constants.PREFRENCE_TOKEN, "");
 
