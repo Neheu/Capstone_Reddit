@@ -21,6 +21,7 @@ public class GetSubredditsModel {
     @Expose
     public Data data;
 
+
     public class Data {
 
         @SerializedName("modhash")

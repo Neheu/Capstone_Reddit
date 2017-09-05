@@ -252,7 +252,7 @@ public class GetSubredditByTypeModel {
         @SerializedName("created")
         @Expose
         private Integer created;
-        @SerializedName("url")
+        @SerializedName("thumb_url")
         @Expose
         private String url;
         @SerializedName("whitelist_status")
@@ -963,7 +963,7 @@ public class GetSubredditByTypeModel {
 
     public class Resolution {
 
-        @SerializedName("url")
+        @SerializedName("thumb_url")
         @Expose
         private String url;
         @SerializedName("width")
@@ -1002,7 +1002,7 @@ public class GetSubredditByTypeModel {
 
     public class Resolution_ {
 
-        @SerializedName("url")
+        @SerializedName("thumb_url")
         @Expose
         private String url;
         @SerializedName("width")
@@ -1045,7 +1045,7 @@ public class GetSubredditByTypeModel {
     }
     public class Source {
 
-        @SerializedName("url")
+        @SerializedName("thumb_url")
         @Expose
         private String url;
         @SerializedName("width")
@@ -1082,7 +1082,7 @@ public class GetSubredditByTypeModel {
     }
     public class Source_ {
 
-        @SerializedName("url")
+        @SerializedName("thumb_url")
         @Expose
         private String url;
         @SerializedName("width")

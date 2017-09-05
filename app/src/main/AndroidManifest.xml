@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,7 +35,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
         </activity>
         <activity
@@ -46,13 +44,17 @@
         <activity
             android:name=".activity.HomePageActivity"
             android:label="@string/title_activity_home_page"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <provider
-            android:authorities="com.capstone.readyit.contentprovider"
-            android:name=".db.ReadyitProvider"
-            android:exported="false">
-        </provider>
+            android:theme="@style/AppTheme.NoActionBar" />
 
+        <provider
+            android:name=".db.ReadyitProvider"
+            android:authorities="com.capstone.readyit.contentprovider"
+            android:exported="false"></provider>
+
+        <activity
+            android:name=".activity.SubredditDetailActivity"
+            android:label="@string/title_activity_subreddit_detail"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).putExtra("for_my_subreddits",false);
                 startActivity(intent);
             }
         });

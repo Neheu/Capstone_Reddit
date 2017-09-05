@@ -15,8 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.udacity.project.reddit.capstone.R;
-import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
 import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
+import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
 import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
 import com.udacity.project.reddit.capstone.utils.OnLoadMoreListener;
 
@@ -39,14 +39,13 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
     private checkChangeListener checkHandler;
     private boolean isLoading;
     private int visibleThreshold = 10;
-    RedyItSQLiteOpenHelper dbHelper;
     private int lastVisibleItem, totalItemCount;
-    public SubredditsAdapters(final Context actContext, RecyclerView rv, final List<SubscribeRedditsViewModel> subredditDataList, checkChangeListener listener) {
+    onSubredditSelectListener clickHandler;
+    public SubredditsAdapters(final Context actContext, RecyclerView rv, final List<SubscribeRedditsViewModel> subredditDataList, checkChangeListener listener,onSubredditSelectListener handler) {
         this.context = actContext;
         this.resultDataList = subredditDataList;
         this.checkHandler = listener;
-        dbHelper = new RedyItSQLiteOpenHelper(context);
-
+        this.clickHandler = handler;
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rv.getLayoutManager();
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -93,7 +92,10 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
             if (resultDataList.size() != 0) {
                 final SubscribeRedditsViewModel data = resultDataList.get(position);
                 vHoler.title.setText(data.title);
-
+                if(data.hasChecked)
+                {
+                    vHoler.switchCompat.setChecked(true);
+                }
                 vHoler.switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -105,29 +107,17 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
                             vHoler.switchCompat.setId(resultDataList.size());
                             checkHandler.checkCount(count);
                         } else {
-//                            if(data.hasChecked)
-//                            {
-//                                count++;
-//                                data.isSelected(true);
-//                                data.hasChecked = false;
-//                                checkedList.put(data.title,resultDataList.get(position));
-//                                vHoler.switchCompat.setId(resultDataList.size());
-//                                checkHandler.checkCount(count);
-//                            }
-//                            else
-//                            {
-                                count--;
-                                data.isSelected(false);
-                                checkHandler.checkCount(count);
-                                for(String key: checkedList.keySet()) {
-                                    if (key.equals(data.title)) {
-                                        checkedList.remove(key);
-                                        break;
-                                    }
+
+                            count--;
+                            data.isSelected(false);
+                            checkHandler.checkCount(count);
+                            for(String key: checkedList.keySet()) {
+                                if (key.equals(data.title)) {
+                                    checkedList.remove(key);
+                                    break;
                                 }
                             }
-
-//                        }
+                        }
                     }
                 });
                 vHoler.switchCompat.setChecked(data.hasChecked);
@@ -148,7 +138,10 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
     public interface checkChangeListener {
         void checkCount(int count);
     }
+    public interface onSubredditSelectListener {
+        void onClick(SubscribeRedditsViewModel dataHolder);
 
+    }
     @Override
     public int getItemViewType(int position) {
         return resultDataList.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;    }
@@ -173,7 +166,8 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         public void onClick(View v) {
-
+            SubscribeRedditsViewModel moviesDataHolder = resultDataList.get(getAdapterPosition());
+            clickHandler.onClick(moviesDataHolder);
         }
     }
     static class LoadingViewHolder extends RecyclerView.ViewHolder {
@@ -182,8 +176,5 @@ public class SubredditsAdapters extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
         }
-    }
-    public void setLoaded() {
-        isLoading = false;
     }
 }

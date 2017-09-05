@@ -20,5 +20,11 @@
     <string name="title_activity_home_page">HomePageActivity</string>
     <string name="subscribe">Subscribe</string>
     <string name="unsubscribe">Unsubscribe</string>
+    <string name="posts">Posts</string>
+    <string name="share">Share</string>
+    <string name="up_vote">Like the subreddit</string>
+    <string name="down_vote">dislike subreddit</string>
+    <string name="comment">Comment</string>
+    <string name="title_activity_subreddit_detail">SubredditDetailActivity</string>
 
 </resources>

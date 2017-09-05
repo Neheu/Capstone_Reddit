@@ -15,13 +15,13 @@ public class Constants {
             "duration=permanent&scope=edit, flair, history, modconfig, modflair, modlog, modposts, modwiki, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote, wikiedit, wikiread";
     public static final String REDIRECT_URI =
             "http://www.example.com/redirect";
-
     public static final String STATE = "RANDON_STATE_STRING";
 
     public static final String ACCESS_TOKEN_URL =
             "https://www.reddit.com/api/v1/access_token";
     public static final String PREFRENCE_AFTER = "after";
     public static final String PREFRENCE_BEFORE = "before";
+    public static final String INTENT_SUBREDDIT_DETAIL_DATA = "sub_detail_data";
 
     // Prefrences.........
     public static String PREFRENCE_NAME = "reddit_pref";

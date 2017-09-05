@@ -2,6 +2,7 @@ package com.udacity.project.reddit.capstone.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.udacity.project.reddit.capstone.R;
+import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
 import com.udacity.project.reddit.capstone.utils.Constants;
+import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +26,8 @@ public class SplashScreenActivity extends AppCompatActivity {
     LinearLayout rootLayout;
     @BindView(R.id.txt_reddit)
     TextView txtReddit;
+    SQLiteDatabase db;
+    RedyItSQLiteOpenHelper dbHelper;
 
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -39,6 +44,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         txtReddit = (TextView) findViewById(R.id.txt_reddit);
+        dbHelper = new RedyItSQLiteOpenHelper(this);
+        db = dbHelper.getReadableDatabase();
         StartAnimations();
         SplashRestThread thread = new SplashRestThread();
         thread.start();
@@ -76,7 +83,10 @@ public class SplashScreenActivity extends AppCompatActivity {
                         public void run() {
                             SharedPreferences pref = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
                             if (pref != null && pref.contains(Constants.PREFRENCE_TOKEN))
-                                startActivity(new Intent(SplashScreenActivity.this, SubRedditsActivity.class));
+//                                if (dbHelper.isTableNotEmpty(DatabaseUtils.TABLE_SUBS_SUBREDDIT, db)) {
+//
+//                                } else
+                                    startActivity(new Intent(SplashScreenActivity.this, SubRedditsActivity.class).putExtra("for_my_subreddits", false));
                             else
 
                                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));

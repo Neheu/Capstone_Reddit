@@ -17,4 +17,5 @@
     <color name="colorDivider">#BDBDBD</color>
 
     <color name="colorTxtHint">#66000000</color>
+    <color name="icon_gray_color">#d2cccc</color>
 </resources>

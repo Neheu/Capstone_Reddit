@@ -1,5 +1,6 @@
 package com.udacity.project.reddit.capstone.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
@@ -43,7 +44,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SwipeRefreshLayout.OnRefreshListener {
+public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SubredditsAdapters.onSubredditSelectListener, SwipeRefreshLayout.OnRefreshListener {
     private ApiInterface apiInterface;
     private RecyclerView recycleViewSubreddit;
     @BindView(R.id.btn_done)
@@ -59,6 +60,8 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     private SubredditsAdapters adapters;
     private NetworkUtils networkUtils;
     private List<String> sub = new ArrayList<>(), unsub = new ArrayList<>();
+    Intent intent;
+    boolean is_for_mysubreddits;
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
@@ -76,6 +79,8 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         recycleViewSubreddit.setLayoutManager(gridLayoutManager);
         dbHelper = new RedyItSQLiteOpenHelper(this);
         swipeRefreshLayout.setOnRefreshListener(this);
+        intent = getIntent();
+        intent.getBooleanExtra("for_my_subreddits", true);
 
 
         //Connect to ReteoFit and get subreddits
@@ -99,7 +104,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                                 }
         );
 
-        adapters = new SubredditsAdapters(SubRedditsActivity.this, recycleViewSubreddit, favList, SubRedditsActivity.this);
+        adapters = new SubredditsAdapters(SubRedditsActivity.this, recycleViewSubreddit, favList, SubRedditsActivity.this, SubRedditsActivity.this);
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,12 +118,12 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                     else
                         unsub.add(value.display_name);
 
-      }
-                if (sub.size() > 0)
-                    requestForSubredditSubscription("sub", android.text.TextUtils.join(",", sub));
+                }
+//                if (sub.size() > 0)
+//                    requestForSubredditSubscription("sub", android.text.TextUtils.join(",", sub));
 //                if (unsub.size() > 0)
 //                    requestForSubredditSubscription("unsub", android.text.TextUtils.join(",", unsub));
-
+                getMySubscribedSubreddits();
 
             }
         });
@@ -151,7 +156,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                 if (list != null && list.size() > 0) {
                     for (GetSubredditsModel.Child data : list) {
                         if (!dbHelper.isAlreadyInserted(data.data.id))
-                            dbHelper.insertSubSubreddits(data.data);
+                            dbHelper.insertSubSubreddits(data);
                     }
                     before = list.get(0).data.name;
                     after = list.get(list.size() - 1).data.name;
@@ -180,13 +185,14 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
             do {
                 SubscribeRedditsViewModel holder = new SubscribeRedditsViewModel();
                 holder.id = cursor.getString(cursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
-
                 holder.hasChecked = Boolean.valueOf(subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.IS_SUBSCRIBED)));
                 holder.display_name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.DISPLAY_NAME));
                 holder.url = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.URL));
                 holder.name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.NAME));
                 holder.title = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.TITLE));
-
+                holder.kind = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.KIND));
+                holder.subCount = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBS_COUNT));
+                holder.subreddit_id = holder.kind + "_" + holder.id;
                 favList.add(holder);
             }
 
@@ -272,14 +278,15 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
             }
         });
     }
+
     private void getMySubscribedSubreddits() {
         OkHttpClient client = new OkHttpClient();
         String token = preferences.getString(Constants.PREFRENCE_TOKEN, "");
 
 
         Request request = new Request.Builder()
-                .addHeader("Authorization", "bearer "+token)
-                .url(Constants.API_OAUTH_BASE_URL + Constants.API_SUBREDDIT+"/mine/subscriber")
+                .addHeader("Authorization", "bearer " + token)
+                .url(Constants.API_OAUTH_BASE_URL + Constants.API_SUBREDDIT + "/mine/subscriber")
                 .build();
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
@@ -301,4 +308,9 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         });
     }
 
+    @Override
+    public void onClick(SubscribeRedditsViewModel dataHolder) {
+        startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class).putExtra("data",dataHolder));
+
+    }
 }
