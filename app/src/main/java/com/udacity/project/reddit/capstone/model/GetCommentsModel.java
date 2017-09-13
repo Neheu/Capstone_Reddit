@@ -17,6 +17,7 @@ import java.util.List;
 
 public class GetCommentsModel {
 
+
     public class Child {
 
         @SerializedName("kind")
@@ -28,27 +29,14 @@ public class GetCommentsModel {
 
     }
 
-
-    public class Child_ {
-
-        @SerializedName("kind")
-        @Expose
-        public String kind;
-        @SerializedName("data")
-        @Expose
-        public Data___ data;
-
-    }
-
-
     public class Data {
 
         @SerializedName("modhash")
         @Expose
         public String modhash;
-        @SerializedName("children")
-        @Expose
-        public List<Child> children = null;
+//        @SerializedName("children")
+//        @Expose
+//        public List<Child> children = null;
         @SerializedName("after")
         @Expose
         public Object after;
@@ -90,7 +78,7 @@ public class GetCommentsModel {
         public Object likes;
         @SerializedName("suggested_sort")
         @Expose
-        public Object suggestedSort;
+        public String suggestedSort;
         @SerializedName("user_reports")
         @Expose
         public List<Object> userReports = null;
@@ -99,7 +87,7 @@ public class GetCommentsModel {
         public Object secureMedia;
         @SerializedName("link_flair_text")
         @Expose
-        public String linkFlairText;
+        public Object linkFlairText;
         @SerializedName("id")
         @Expose
         public String id;
@@ -162,10 +150,10 @@ public class GetCommentsModel {
         public Boolean edited;
         @SerializedName("link_flair_css_class")
         @Expose
-        public String linkFlairCssClass;
+        public Object linkFlairCssClass;
         @SerializedName("author_flair_css_class")
         @Expose
-        public String authorFlairCssClass;
+        public Object authorFlairCssClass;
         @SerializedName("contest_mode")
         @Expose
         public Boolean contestMode;
@@ -222,7 +210,7 @@ public class GetCommentsModel {
         public String url;
         @SerializedName("author_flair_text")
         @Expose
-        public String authorFlairText;
+        public Object authorFlairText;
         @SerializedName("quarantine")
         @Expose
         public Boolean quarantine;
@@ -267,7 +255,7 @@ public class GetCommentsModel {
         public String linkId;
         @SerializedName("replies")
         @Expose
-        public Replies replies;
+        public String replies;
         @SerializedName("parent_id")
         @Expose
         public String parentId;
@@ -299,49 +287,6 @@ public class GetCommentsModel {
     }
 
 
-    public class Data__ {
-
-        @SerializedName("modhash")
-        @Expose
-        public String modhash;
-        @SerializedName("children")
-        @Expose
-        public List<Child_> children = null;
-        @SerializedName("after")
-        @Expose
-        public Object after;
-        @SerializedName("before")
-        @Expose
-        public Object before;
-
-    }
-
-
-    public class Data___ {
-
-        @SerializedName("count")
-        @Expose
-        public Integer count;
-        @SerializedName("name")
-        @Expose
-        public String name;
-        @SerializedName("id")
-        @Expose
-        public String id;
-        @SerializedName("parent_id")
-        @Expose
-        public String parentId;
-        @SerializedName("depth")
-        @Expose
-        public Integer depth;
-        @SerializedName("children")
-        @Expose
-        public List<String> children = null;
-
-    }
-
-
-    public class RootData {
 
         @SerializedName("kind")
         @Expose
@@ -350,24 +295,12 @@ public class GetCommentsModel {
         @Expose
         public Data data;
 
-    }
+
 
 
 
     public class MediaEmbed {
 
-
-    }
-
-
-    public class Replies {
-
-        @SerializedName("kind")
-        @Expose
-        public String kind;
-        @SerializedName("data")
-        @Expose
-        public Data__ data;
 
     }
 

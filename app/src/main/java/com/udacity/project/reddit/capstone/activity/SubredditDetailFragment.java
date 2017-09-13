@@ -108,18 +108,18 @@ public class SubredditDetailFragment extends Fragment {
 
     private void connectApiClient() {
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<List<GetCommentsModel.RootData>> call = apiInterface.doGetComments("/r/" + data.subreddit_name + "/comments/"
+        Call<List<GetCommentsModel>> call = apiInterface.doGetComments("/r/" + data.subreddit_name + "/comments/"
                 + data.id + "/.json");
 
-        call.enqueue(new Callback<List<GetCommentsModel.RootData>>() {
+        call.enqueue(new Callback<List<GetCommentsModel>>() {
             @Override
-            public void onResponse(Call<List<GetCommentsModel.RootData>> call, Response<List<GetCommentsModel.RootData>> response) {
+            public void onResponse(Call<List<GetCommentsModel>> call, Response<List<GetCommentsModel>> response) {
                 response.isSuccessful();
-                List<GetCommentsModel.RootData> commentsModel = response.body();
+                List<GetCommentsModel> commentsModel = response.body();
             }
 
             @Override
-            public void onFailure(Call<List<GetCommentsModel.RootData>> call, Throwable t) {
+            public void onFailure(Call<List<GetCommentsModel>> call, Throwable t) {
 
             }
         });
