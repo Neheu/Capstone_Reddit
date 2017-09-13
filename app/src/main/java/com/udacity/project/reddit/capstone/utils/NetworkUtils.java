@@ -25,15 +25,5 @@ public class NetworkUtils {
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
-    public static class CommentsEndpointResponse {
 
-        private List<GetCommentsModel.RootData> comments;
-
-        // public constructor is necessary for collections
-        public CommentsEndpointResponse() {
-            comments = new ArrayList<>();
-        }
-
-
-    }
 }

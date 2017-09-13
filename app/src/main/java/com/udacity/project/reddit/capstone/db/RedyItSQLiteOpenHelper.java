@@ -89,29 +89,29 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         context.getContentResolver().insert(ReadyItContract.ReadyitEntry.CONTENT_URI, contentValues);
     }
 
-    public void insertComments(GetCommentsModel.Child dataHolder) {
-
-        // Create new empty ContentValues object
-        ContentValues contentValues = new ContentValues();
-        // Put the movie data into the ContentValues
-        contentValues.put(ReadyItContract.ReadyitEntry._ID, dataHolder.data.id);
-        contentValues.put(ReadyItContract.ReadyitEntry.DEPTH, dataHolder.data.depth);
-        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_ID, dataHolder.data.subredditId);
-        contentValues.put(ReadyItContract.ReadyitEntry.LIKES, (int)dataHolder.data.likes);
-        contentValues.put(ReadyItContract.ReadyitEntry.AUTHOR, dataHolder.data.author);
-        contentValues.put(ReadyItContract.ReadyitEntry.PARENT_ID, dataHolder.data.parentId);
-        contentValues.put(ReadyItContract.ReadyitEntry.SCORE, dataHolder.data.score);
-        contentValues.put(ReadyItContract.ReadyitEntry.BODY, dataHolder.data.body);
-        contentValues.put(ReadyItContract.ReadyitEntry.DOWN, dataHolder.data.downs);
-        contentValues.put(ReadyItContract.ReadyitEntry.UP, dataHolder.data.ups);
-        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_NAME, dataHolder.data.subreddit);
-        contentValues.put(ReadyItContract.ReadyitEntry.NAME, dataHolder.data.name);
-        contentValues.put(ReadyItContract.ReadyitEntry.LINK_ID, dataHolder.data.linkId);
-
-        // Insert the content values via a ContentResolver
-        ReadyitProvider.tableToProcess(TABLE_COMMENTS);
-        context.getContentResolver().insert(ReadyItContract.ReadyitEntry.CONTENT_URI, contentValues);
-    }
+//    public void insertComments(GetCommentsModel.Child dataHolder) {
+//
+//        // Create new empty ContentValues object
+//        ContentValues contentValues = new ContentValues();
+//        // Put the movie data into the ContentValues
+//        contentValues.put(ReadyItContract.ReadyitEntry._ID, dataHolder.data.id);
+//        contentValues.put(ReadyItContract.ReadyitEntry.DEPTH, dataHolder.data.depth);
+//        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_ID, dataHolder.data.subredditId);
+//        contentValues.put(ReadyItContract.ReadyitEntry.LIKES, (int)dataHolder.data.likes);
+//        contentValues.put(ReadyItContract.ReadyitEntry.AUTHOR, dataHolder.data.author);
+//        contentValues.put(ReadyItContract.ReadyitEntry.PARENT_ID, dataHolder.data.parentId);
+//        contentValues.put(ReadyItContract.ReadyitEntry.SCORE, dataHolder.data.score);
+//        contentValues.put(ReadyItContract.ReadyitEntry.BODY, dataHolder.data.body);
+//        contentValues.put(ReadyItContract.ReadyitEntry.DOWN, dataHolder.data.downs);
+//        contentValues.put(ReadyItContract.ReadyitEntry.UP, dataHolder.data.ups);
+//        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_NAME, dataHolder.data.subreddit);
+//        contentValues.put(ReadyItContract.ReadyitEntry.NAME, dataHolder.data.name);
+//        contentValues.put(ReadyItContract.ReadyitEntry.LINK_ID, dataHolder.data.linkId);
+//
+//        // Insert the content values via a ContentResolver
+//        ReadyitProvider.tableToProcess(TABLE_COMMENTS);
+//        context.getContentResolver().insert(ReadyItContract.ReadyitEntry.CONTENT_URI, contentValues);
+//    }
 
     /**
      * UPDATE

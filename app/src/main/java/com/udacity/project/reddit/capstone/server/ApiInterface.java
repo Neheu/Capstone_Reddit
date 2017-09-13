@@ -26,6 +26,6 @@ public interface ApiInterface {
     @GET
     Call<GetDetailedSubredditListModel> doGetDetailSubredditByType(@Url String url);
     @GET
-    Call<List<NetworkUtils.CommentsEndpointResponse>> doGetComments(@Url String url);
+    Call<List<GetCommentsModel.RootData>> doGetComments(@Url String url);
 
 }
