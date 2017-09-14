@@ -66,7 +66,7 @@ public class SubredditDetailListAdapter extends RecyclerView.Adapter<RecyclerVie
             vHoler.vote_count.setText(String.valueOf(data.up));
             vHoler.comment_count.setText(String.valueOf(data.comment_count));
             vHoler.detail.setText(data.subreddit_title);
-            Picasso.with(context).load(data.thumb_url).error(R.mipmap.redit_icon).into(vHoler.thum_img);
+            Picasso.with(context).load(data.thumb_url).skipMemoryCache().fit().error(R.mipmap.redit_icon).into(vHoler.thum_img);
             vHoler.share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -71,7 +71,6 @@ public class SubredditDetailFragment extends Fragment {
         if (movieBackdrop != null) {
             Picasso.with(activity)
                     .load(data.thumb_url)
-                    .config(Bitmap.Config.RGB_565)
                     .into(movieBackdrop);
         }
         if (savedInstanceState == null) {

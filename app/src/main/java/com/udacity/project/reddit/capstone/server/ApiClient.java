@@ -2,6 +2,7 @@ package com.udacity.project.reddit.capstone.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.udacity.project.reddit.capstone.model.GetCommentsModel;
 import com.udacity.project.reddit.capstone.utils.Constants;
 
 import retrofit2.Retrofit;
@@ -17,6 +18,7 @@ public class ApiClient {
 
     public static Retrofit getClient() {
         Gson gson = new GsonBuilder()
+                .registerTypeAdapter(GetCommentsModel.class, new GetCommentsModel.ReplyDeserializer())
                 .setLenient()
                 .create();
         if (retrofit==null) {

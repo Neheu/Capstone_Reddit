@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.adapters.SubredditDetailListAdapter;
 import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
@@ -54,8 +53,6 @@ public class SubredditDetailActivity extends AppCompatActivity {
         }
 
         if (savedInstanceState == null) {
-
-
             data = getIntent().getExtras().getParcelable(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
 
             Bundle arguments = new Bundle();
