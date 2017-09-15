@@ -108,12 +108,9 @@ public class GetCommentsModel {
         @Expose
         public String id;
         public Reply mReplyData;
-        public void setReply(String rated) throws JSONException {
-            JsonParser parser = new JsonParser();
-            JsonElement mJson =  parser.parse(rated);
-            Gson gson = new Gson();
-            Reply object = gson.fromJson(mJson, Reply.class);
-            mReplyData = object;
+        public void setReply(Reply rep) throws JSONException {
+
+            mReplyData = rep;
 
         }
         //        @SerializedName("banned_at_utc")
@@ -335,24 +332,38 @@ public class GetCommentsModel {
 
 
 
-    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel.Data_> {
-        GetCommentsModel.Data_ replyState;
+    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel> {
+        GetCommentsModel replyState;
 
        @Override
-        public GetCommentsModel.Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public GetCommentsModel deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                replyState = new Gson().fromJson(json, GetCommentsModel.Data_.class);
+                replyState = new Gson().fromJson(json, GetCommentsModel.class);
                 JsonObject jsonObject = json.getAsJsonObject();
-                if (jsonObject.has("replies")) {
 
-                    JsonElement elem = jsonObject.get("replies");
-                    if (elem != null && !elem.isJsonNull()) {
-                        if (elem.isJsonPrimitive()) {
-                           // replyState.setReply(jsonObject.get("replies").getAsString());
-                            replyState.setReply(elem.getAsJsonObject().get("value").getAsString());
-                        } else {
-                            replyState.setReply(null);                        }
+
+                if (jsonObject.has("data")) {
+                    Data data = context.deserialize(jsonObject.get("data"),GetCommentsModel.Data.class);
+
+                    List<GetCommentsModel.Child> child = data.children;
+                    for(Child childData : child) {
+                        Data_ d = childData.data;
+
+
+                        if (d.replies!=null &&!d.replies.equals("")) {
+                            d.setReply(d.replies);
+                        }
+                         else {
+                            d.setReply(null);
+                        }
                     }
+//                    if (elem != null && !elem.isJsonNull()) {
+//                        if (elem.isJsonPrimitive()) {
+//                           // replyState.setReply(jsonObject.get("replies").getAsString());
+//                            replyState.setReply(elem.getAsJsonObject().get("value").getAsString());
+//                        } else {
+//                            replyState.setReply(null);                        }
+//                    }
 
 
 
@@ -364,8 +375,12 @@ public class GetCommentsModel {
 //                        }
 
                 }
+                else
+                {
+                    String rep = jsonObject.get("replies").getAsString();
+                }
             } catch (Exception exp) {
-
+                String e = exp.toString();
             }
             return replyState;
         }
