@@ -18,7 +18,7 @@ public class ApiClient {
 
     public static Retrofit getClient() {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(GetCommentsModel.class, new GetCommentsModel.ReplyDeserializer())
+                .registerTypeAdapter(GetCommentsModel.Data_.class, new GetCommentsModel.ReplyDeserializer())
                 .setLenient()
                 .create();
         if (retrofit==null) {

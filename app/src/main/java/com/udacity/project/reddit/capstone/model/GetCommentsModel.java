@@ -8,9 +8,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
@@ -28,7 +30,6 @@ public class GetCommentsModel {
     @Expose
     public Data data;
 
-    public String mReplyData;
 
 
     public class Child {
@@ -61,6 +62,8 @@ public class GetCommentsModel {
 
 
     public class Data_ {
+
+
 
         //        @SerializedName("domain")
 //        @Expose
@@ -104,6 +107,15 @@ public class GetCommentsModel {
         @SerializedName("id")
         @Expose
         public String id;
+        public Reply mReplyData;
+        public void setReply(String rated) throws JSONException {
+            JsonParser parser = new JsonParser();
+            JsonElement mJson =  parser.parse(rated);
+            Gson gson = new Gson();
+            Reply object = gson.fromJson(mJson, Reply.class);
+            mReplyData = object;
+
+        }
         //        @SerializedName("banned_at_utc")
 //        @Expose
 //        public Object bannedAtUtc;
@@ -268,7 +280,7 @@ public class GetCommentsModel {
         public String linkId;
         //        @SerializedName("replies")
 //        @Expose
-//        public Reply replies;
+        public Reply replies;
         @SerializedName("parent_id")
         @Expose
         public String parentId;
@@ -320,34 +332,39 @@ public class GetCommentsModel {
         public Data data;
     }
 
-    public String getReply() {
-        return mReplyData;
-    }
 
-    public void setReply(String rated) {
-        this.mReplyData = rated;
-    }
 
-    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel> {
-        GetCommentsModel replyState;
 
-        @Override
-        public GetCommentsModel deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel.Data_> {
+        GetCommentsModel.Data_ replyState;
+
+       @Override
+        public GetCommentsModel.Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                GetCommentsModel replyState = new Gson().fromJson(json, GetCommentsModel.class);
+                replyState = new Gson().fromJson(json, GetCommentsModel.Data_.class);
                 JsonObject jsonObject = json.getAsJsonObject();
-
                 if (jsonObject.has("replies")) {
-                        if (!jsonObject.get("replies").equals("")) {
-                            replyState.setReply(jsonObject.get("replies").getAsString());
-                        }
-                         else {
-                            replyState.setReply(null);
-                        }
+
+                    JsonElement elem = jsonObject.get("replies");
+                    if (elem != null && !elem.isJsonNull()) {
+                        if (elem.isJsonPrimitive()) {
+                           // replyState.setReply(jsonObject.get("replies").getAsString());
+                            replyState.setReply(elem.getAsJsonObject().get("value").getAsString());
+                        } else {
+                            replyState.setReply(null);                        }
+                    }
+
+
+
+//                        if (!jsonObject.get("replies").equals("")) {
+//                            replyState.setReply(jsonObject.get("replies").getAsString());
+//                        }
+//                         else {
+//                            replyState.setReply(null);
+//                        }
 
                 }
             } catch (Exception exp) {
-                Log.e("kjdf",exp.toString());
 
             }
             return replyState;
