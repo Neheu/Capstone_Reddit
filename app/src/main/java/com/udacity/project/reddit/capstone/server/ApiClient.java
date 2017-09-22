@@ -18,10 +18,10 @@ public class ApiClient {
 
     public static Retrofit getClient() {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(GetCommentsModel.class, new GetCommentsModel.ReplyDeserializer())
+                .registerTypeAdapter(GetCommentsModel.Data_.class, new GetCommentsModel.ReplyDeserializer())
                 .setLenient()
                 .create();
-        if (retrofit==null) {
+        if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(Constants.API_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))

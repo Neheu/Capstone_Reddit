@@ -3,6 +3,7 @@ package com.udacity.project.reddit.capstone.model;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -11,12 +12,16 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.udacity.project.reddit.capstone.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Neha on 04-09-2017.
@@ -29,7 +34,6 @@ public class GetCommentsModel {
     @SerializedName("data")
     @Expose
     public Data data;
-
 
 
     public class Child {
@@ -62,7 +66,6 @@ public class GetCommentsModel {
 
 
     public class Data_ {
-
 
 
         //        @SerializedName("domain")
@@ -108,11 +111,13 @@ public class GetCommentsModel {
         @Expose
         public String id;
         public Reply mReplyData;
+
         public void setReply(Reply rep) throws JSONException {
 
             mReplyData = rep;
 
         }
+
         //        @SerializedName("banned_at_utc")
 //        @Expose
 //        public Object bannedAtUtc;
@@ -277,7 +282,7 @@ public class GetCommentsModel {
         public String linkId;
         //        @SerializedName("replies")
 //        @Expose
-        public Reply replies;
+        // public Reply replies;
         @SerializedName("parent_id")
         @Expose
         public String parentId;
@@ -328,57 +333,42 @@ public class GetCommentsModel {
         @Expose
         public Data data;
     }
+    static Retrofit retrofit = null;
+    public static Retrofit getClient() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(GetCommentsModel.Data_.class, new GetCommentsModel.ReplyDeserializer())
+                .setLenient()
+                .create();
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(Constants.API_BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
+        return retrofit;
+    }
+    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel.Data_> {
+        GetCommentsModel.Data_ replyState;
 
-
-
-
-    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel> {
-        GetCommentsModel replyState;
-
-       @Override
-        public GetCommentsModel deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        @Override
+        public GetCommentsModel.Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                replyState = new Gson().fromJson(json, GetCommentsModel.class);
+                replyState = new Gson().fromJson(json, GetCommentsModel.Data_.class);
                 JsonObject jsonObject = json.getAsJsonObject();
+                if (jsonObject.has("replies")) {
+                    JsonElement elem = jsonObject.get("replies");
 
-
-                if (jsonObject.has("data")) {
-                    Data data = context.deserialize(jsonObject.get("data"),GetCommentsModel.Data.class);
-
-                    List<GetCommentsModel.Child> child = data.children;
-                    for(Child childData : child) {
-                        Data_ d = childData.data;
-
-
-                        if (d.replies!=null &&!d.replies.equals("")) {
-                            d.setReply(d.replies);
-                        }
-                         else {
-                            d.setReply(null);
+                    if (elem != null && !elem.isJsonNull()) {
+                        if (elem.isJsonObject()) {
+                           Reply rep = new Gson().fromJson(elem, GetCommentsModel.Reply.class);
+                           // Reply rep = context.deserialize(jsonObject.get("replies"), GetCommentsModel.Reply.class);
+                            replyState.setReply(rep);
+                        } else {
+                            replyState.setReply(null);
                         }
                     }
-//                    if (elem != null && !elem.isJsonNull()) {
-//                        if (elem.isJsonPrimitive()) {
-//                           // replyState.setReply(jsonObject.get("replies").getAsString());
-//                            replyState.setReply(elem.getAsJsonObject().get("value").getAsString());
-//                        } else {
-//                            replyState.setReply(null);                        }
-//                    }
-
-
-
-//                        if (!jsonObject.get("replies").equals("")) {
-//                            replyState.setReply(jsonObject.get("replies").getAsString());
-//                        }
-//                         else {
-//                            replyState.setReply(null);
-//                        }
-
                 }
-                else
-                {
-                    String rep = jsonObject.get("replies").getAsString();
-                }
+
             } catch (Exception exp) {
                 String e = exp.toString();
             }

@@ -36,6 +36,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,6 +44,9 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.udacity.project.reddit.capstone.utils.Constants.ACCESS_TOKEN_URL;
+import static com.udacity.project.reddit.capstone.utils.Constants.REDIRECT_URI;
 
 public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SubredditsAdapters.onSubredditSelectListener, SwipeRefreshLayout.OnRefreshListener {
     private ApiInterface apiInterface;
@@ -61,7 +65,6 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     private NetworkUtils networkUtils;
     private List<String> sub = new ArrayList<>(), unsub = new ArrayList<>();
     Intent intent;
-    boolean is_for_mysubreddits;
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
@@ -241,47 +244,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    private void requestForSubredditSubscription(String action, String name) {
-        OkHttpClient client = new OkHttpClient();
-        String encodedAuthString = preferences.getString(Constants.PREFRENCE_TOKEN, "");
-
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("action", action)
-                .addFormDataPart("skip_initial_defaults", "false")
-                .addFormDataPart("sr_name", name)
-                .build();
-
-        Request request = new Request.Builder()
-                .addHeader("User-Agent", "Sample App")
-                .addHeader("Authorization", "bearer  " + encodedAuthString)
-                .url(Constants.API_OAUTH_BASE_URL + "/api/subscribe/.json")
-                .method("POST", RequestBody.create(null, new byte[0]))
-                .post(requestBody)
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                Log.e(">> ", "ERROR: " + e);
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-                String json = response.body().string();
-                int code = response.code();
-
-                if (code == 200) {
-
-                }
-
-            }
-        });
-    }
 
     private void getMySubscribedSubreddits() {
         OkHttpClient client = new OkHttpClient();
-        String token = preferences.getString(Constants.PREFRENCE_TOKEN, "");
+        String token = Constants.getToken(this);
 
 
         Request request = new Request.Builder()
@@ -308,9 +274,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         });
     }
 
+
     @Override
     public void onClick(SubscribeRedditsViewModel dataHolder) {
-        startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class).putExtra("data",dataHolder));
+        startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class).putExtra("data", dataHolder));
 
     }
 }

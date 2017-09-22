@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).putExtra("for_my_subreddits",false);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).putExtra("for_my_subreddits", false);
                 startActivity(intent);
             }
         });
@@ -104,8 +105,8 @@ public class LoginActivity extends AppCompatActivity {
         String encodedAuthString = Base64.encodeToString(authString.getBytes(),
                 Base64.NO_WRAP);
         Request request = new Request.Builder()
-                .addHeader("User-Agent", "Sample App")
-                .addHeader("Authorization", "Basic " + encodedAuthString)
+                .addHeader(Constants.USER_AGENT_STRING, "Sample App")
+                .addHeader(Constants.AUTHORIZATION, "Basic " + encodedAuthString)
                 .url(ACCESS_TOKEN_URL)
                 .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"),
                         "grant_type=authorization_code&code=" + code +
@@ -129,6 +130,10 @@ public class LoginActivity extends AppCompatActivity {
                     String refreshToken = data.optString("refresh_token");
                     editor.putString(Constants.PREFRENCE_TOKEN, accessToken);
                     editor.putString(Constants.PREFRENCE_REFRESH_TOKEN, refreshToken);
+                    Date date = new Date(System.currentTimeMillis());
+
+                    long millis = date.getTime();
+                    editor.putLong(Constants.PRERENCES_TOKEN_REFRESH_TIME, millis);
                     editor.apply();
                     startActivity(new Intent(LoginActivity.this, SubRedditsActivity.class));
                     finish();

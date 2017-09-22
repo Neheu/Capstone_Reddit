@@ -1,12 +1,15 @@
 package com.udacity.project.reddit.capstone.activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +24,13 @@ import com.udacity.project.reddit.capstone.server.ApiClient;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
 import com.udacity.project.reddit.capstone.utils.Constants;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,6 +47,7 @@ public class SubredditDetailFragment extends Fragment {
     RecyclerView rvList;
     private SubredditListViewModel data;
     private RedyItSQLiteOpenHelper dbHelper;
+    private SharedPreferences preferences;
 
 
     @Override
@@ -51,8 +58,9 @@ public class SubredditDetailFragment extends Fragment {
         if (arguments != null && arguments.containsKey(Constants.INTENT_SUBREDDIT_DETAIL_DATA)) {
             data = arguments.getParcelable(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
         }
-        connectApiClient();
+       // connectApiClient();
         // new GetCommentsFromServer().execute();
+        getReplies();
     }
 
 
@@ -94,7 +102,7 @@ public class SubredditDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.subreddit_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
         dbHelper = new RedyItSQLiteOpenHelper(getActivity());
-
+        preferences = getActivity().getSharedPreferences(Constants.PREFRENCE_NAME, Context.MODE_PRIVATE);
 
         return rootView;
     }
@@ -115,6 +123,7 @@ public class SubredditDetailFragment extends Fragment {
             public void onResponse(Call<List<GetCommentsModel>> call, Response<List<GetCommentsModel>> response) {
                 response.isSuccessful();
                 List<GetCommentsModel> commentsModel = response.body();
+
             }
 
             @Override
@@ -123,4 +132,34 @@ public class SubredditDetailFragment extends Fragment {
             }
         });
     }
-   }
+
+    private void getReplies() {
+        OkHttpClient client = new OkHttpClient();
+        String token = Constants.getToken(getContext());
+
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "bearer " + token)
+                .url(Constants.API_OAUTH_BASE_URL + Constants.API_SUBREDDIT +"/r/" + data.subreddit_name + "/comments/"
+                        + data.id + "/.json")
+                .build();
+
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                Log.e(">> ", "ERROR: " + e);
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                String json = response.body().string();
+                int code = response.code();
+
+                if (code == 200) {
+                    List<GetCommentsModel> commentsModel = (List<GetCommentsModel>) response.body();
+                }
+
+            }
+        });
+    }
+
+}

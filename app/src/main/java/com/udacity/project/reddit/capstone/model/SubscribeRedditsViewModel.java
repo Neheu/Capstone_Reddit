@@ -20,6 +20,7 @@ public class SubscribeRedditsViewModel implements Parcelable {
     public String kind;
     public int subCount;
 
+
     public SubscribeRedditsViewModel(Parcel in) {
         id = in.readString();
         title = in.readString();

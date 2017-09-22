@@ -20,6 +20,7 @@ public class SubredditListViewModel implements Parcelable {
     public int subCount;
     public int comment_count;
     public String share_url;
+    public int likes;
 
     public SubredditListViewModel(Parcel in) {
         id = in.readString();
@@ -34,6 +35,7 @@ public class SubredditListViewModel implements Parcelable {
         subCount = in.readInt();
         comment_count = in.readInt();
         share_url = in.readString();
+        likes = in.readInt();
     }
 
     public static final Creator<SubredditListViewModel> CREATOR = new Creator<SubredditListViewModel>() {
@@ -72,6 +74,7 @@ public class SubredditListViewModel implements Parcelable {
         dest.writeInt(subCount);
         dest.writeInt(comment_count);
         dest.writeString(share_url);
+        dest.writeInt(likes);
     }
 }
 

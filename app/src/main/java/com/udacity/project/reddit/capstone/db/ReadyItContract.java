@@ -46,34 +46,34 @@ public class ReadyItContract {
         public static final String THUMB_URL = "thumb_url";
 
 
-
 //id
 
-        public static final String DEPTH="depth";
+        public static final String DEPTH = "depth";
 
 
-     //"subreddit_id";
+        //"subreddit_id";
 
-      public static final String LIKES =  "likes";
+        public static final String LIKES = "likes";
 
 
-      public static final String AUTHOR = "author";
+        public static final String AUTHOR = "author";
 
-      public static final String PARENT_ID  = "parentId";
+        public static final String PARENT_ID = "parentId";
 
-      public static final String SCORE = "score";
+        public static final String SCORE = "score";
 
-    public static final String BODY =  "body";
+        public static final String BODY = "body";
 
-      //DOWNS = "downs";
+        //DOWNS = "downs";
 
-      //SUBREDDIT = "subreddit";
+        //SUBREDDIT = "subreddit";
 
-     //NAME = "name";
+        //NAME = "name";
 
-      //UPS =  "ups";
+        //UPS =  "ups";
 
-     public static final String LINK_ID = "link_id";
+        public static final String LINK_ID = "link_id";
 
+        public static final String MAIN_TITLE = "selftext";
     }
 }

@@ -1,9 +1,21 @@
 package com.udacity.project.reddit.capstone.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.udacity.project.reddit.capstone.utils.Constants;
 
+import java.lang.reflect.Type;
 import java.util.List;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Neha on 01-09-2017.
@@ -23,7 +35,6 @@ public class GetDetailedSubredditListModel {
     }
 
 
-
     @SerializedName("data")
     @Expose
     public Data data;
@@ -32,10 +43,7 @@ public class GetDetailedSubredditListModel {
     public String kind;
 
 
-
-
-    public class Data
-    {
+    public class Data {
         @SerializedName("modhash")
         @Expose
         public String modhash;
@@ -76,9 +84,12 @@ public class GetDetailedSubredditListModel {
         @SerializedName("selftext")
         @Expose
         public String selftext;
-        @SerializedName("likes")
-        @Expose
-        public Object likes;
+//        @SerializedName("likes")
+//        @Expose
+        // public Object likes;
+
+        public int mLikes;
+
         @SerializedName("suggested_sort")
         @Expose
         public Object suggestedSort;
@@ -148,7 +159,7 @@ public class GetDetailedSubredditListModel {
         @SerializedName("subreddit_id")
         @Expose
         public String subredditId;
-//        @SerializedName("edited")
+        //        @SerializedName("edited")
 //        @Expose
 //        public Boolean edited;
         @SerializedName("link_flair_css_class")
@@ -260,8 +271,6 @@ public class GetDetailedSubredditListModel {
     }
 
 
-
-
     public class Image {
 
         @SerializedName("source")
@@ -321,4 +330,33 @@ public class GetDetailedSubredditListModel {
 
 
     }
+
+    public static class LikesDeserializer implements JsonDeserializer<Data_> {
+        Data_ replyState;
+
+        @Override
+        public Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            try {
+                replyState = new Gson().fromJson(json, Data_.class);
+                JsonObject jsonObject = json.getAsJsonObject();
+                if (jsonObject.has("likes")) {
+                    JsonElement elem = jsonObject.get("likes");
+
+                    if (elem == null || elem.isJsonNull()) {
+                        replyState.mLikes = -1;
+//
+                    } else if (elem.getAsBoolean()) {
+                        replyState.mLikes = 1;
+
+                    } else if (!elem.getAsBoolean())
+                        replyState.mLikes = 0;
+                }
+
+            } catch (Exception exp) {
+                String e = exp.toString();
+            }
+            return replyState;
+        }
+    }
 }
+

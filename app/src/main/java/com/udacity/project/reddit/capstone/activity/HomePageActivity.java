@@ -3,38 +3,49 @@ package com.udacity.project.reddit.capstone.activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.adapters.SubredditDetailListAdapter;
 import com.udacity.project.reddit.capstone.db.ReadyItContract;
 import com.udacity.project.reddit.capstone.db.ReadyitProvider;
 import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
+import com.udacity.project.reddit.capstone.model.GetCommentsModel;
 import com.udacity.project.reddit.capstone.model.GetDetailedSubredditListModel;
 import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
 import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
 import com.udacity.project.reddit.capstone.server.ApiClient;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
+import com.udacity.project.reddit.capstone.server.GetRefreshedToken;
 import com.udacity.project.reddit.capstone.utils.Constants;
 import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HomePageActivity extends AppCompatActivity implements SubredditDetailListAdapter.onSubredditSelectListener {
+public class HomePageActivity extends AppCompatActivity implements SubredditDetailListAdapter.onSubredditSelectListener, GetRefreshedToken {
     private ApiInterface apiInterface;
     private Intent intent;
     private String subreddit_url, detail_name, subreddit_id;
@@ -78,10 +89,19 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
 
         db = dbHelper.getWritableDatabase();
         ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
-        adapter = new SubredditDetailListAdapter(this, this, rvList, subredditList);
+        adapter = new SubredditDetailListAdapter(this,this, this, rvList, subredditList);
 
-        connectApiClient();
+//        connectApiClient();
+        new GetSubreddits().execute();
+    }
 
+    class GetSubreddits extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Constants.refreshAccessToken(HomePageActivity.this, HomePageActivity.this);
+            return null;
+        }
     }
 
     @Override
@@ -95,10 +115,50 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
         }
     }
 
-    private void connectApiClient() {
-        apiInterface = ApiClient.getClient().create(ApiInterface.class);
+    private void getSubredditByname(String token) {
+        OkHttpClient client = new OkHttpClient();
 
-        Call call = apiInterface.doGetDetailSubredditByType( subreddit_url + ".json");
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "bearer " + token)
+                .url(Constants.API_OAUTH_BASE_URL + subreddit_url + "/.json")
+                .build();
+
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                Log.e(">> ", "ERROR: " + e);
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                String json = response.body().string();
+                int code = response.code();
+
+                if (code == 200) {
+                    List<GetCommentsModel> commentsModel = (List<GetCommentsModel>) response.body();
+                }
+
+            }
+        });
+    }
+    static Retrofit retrofit = null;
+    public static Retrofit getClient() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(GetDetailedSubredditListModel.Data_.class, new GetDetailedSubredditListModel.LikesDeserializer())
+                .setLenient()
+                .create();
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(Constants.API_OAUTH_BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
+        return retrofit;
+    }
+    private void connectApiClient(String token) {
+        apiInterface = getClient().create(ApiInterface.class);
+        Call call = apiInterface.getSubredditList("bearer " + token, subreddit_url+".json");
+
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -111,17 +171,18 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
                 if (list != null && list.size() > 0) {
                     for (GetDetailedSubredditListModel.Child data : list) {
                         data.data.subs_count = subscriber_count;
+//                        if(data.data.likes==null)
+//                        {
+//                            data.data.likes = -1;
+//                        }
                         dbHelper.insertSubSubredditsDetail(data.data);
                     }
                 }
                 updateList();
-
-
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
-
             }
         });
 
@@ -152,7 +213,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
                 holder.comment_count = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.COMMENTS_COUNT));
                 holder.subreddit_id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_ID));
                 holder.share_url = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.URL));
-
+                holder.likes= subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.LIKES));
                 subredditList.add(holder);
             }
 
@@ -171,5 +232,10 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public void onTokenRefreshed(String token) {
+        connectApiClient(token);
     }
 }

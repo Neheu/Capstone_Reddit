@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.udacity.project.reddit.capstone.model.GetCommentsModel;
 import com.udacity.project.reddit.capstone.model.GetDetailedSubredditListModel;
 import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
+import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
 import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
 import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 
@@ -34,9 +35,9 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //Create table to store movies data
         db.execSQL(DatabaseUtils.CREATE_TABLE_Sub_Subreddit);
-        db.execSQL(DatabaseUtils.CREATE_TABLE_DETAIL_Subreddit);
+        db.execSQL(DatabaseUtils.CREATE_TABLE_SUBREDDIT_DETAIL);
         db.execSQL(DatabaseUtils.CREATE_TABLE_COMMENTS);
-
+        db.execSQL(DatabaseUtils.CREATE_TABLE_COMMENTS_TITLE);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_TITLE, dataHolder.title);
         contentValues.put(ReadyItContract.ReadyitEntry.URL, dataHolder.url);
         contentValues.put(ReadyItContract.ReadyitEntry.THUMB_URL, dataHolder.thumbnail);
-
+        contentValues.put(ReadyItContract.ReadyitEntry.LIKES, dataHolder.mLikes);
         contentValues.put(ReadyItContract.ReadyitEntry.IS_SUBSCRIBED, true);
         contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_ID, dataHolder.subredditId);
         contentValues.put(ReadyItContract.ReadyitEntry.UP, dataHolder.ups);
@@ -89,15 +90,15 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         context.getContentResolver().insert(ReadyItContract.ReadyitEntry.CONTENT_URI, contentValues);
     }
 
-//    public void insertComments(GetCommentsModel.Child dataHolder) {
+//    public void insertComments(GetCommentsModel.Data_ dataHolder) {
 //
 //        // Create new empty ContentValues object
 //        ContentValues contentValues = new ContentValues();
 //        // Put the movie data into the ContentValues
-//        contentValues.put(ReadyItContract.ReadyitEntry._ID, dataHolder.data.id);
-//        contentValues.put(ReadyItContract.ReadyitEntry.DEPTH, dataHolder.data.depth);
-//        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_ID, dataHolder.data.subredditId);
-//        contentValues.put(ReadyItContract.ReadyitEntry.LIKES, (int)dataHolder.data.likes);
+//        contentValues.put(ReadyItContract.ReadyitEntry._ID, dataHolder.id);
+//        contentValues.put(ReadyItContract.ReadyitEntry.DEPTH, dataHolder.depth);
+//        contentValues.put(ReadyItContract.ReadyitEntry.SUBREDDIT_ID, dataHolder.subredditId);
+//        contentValues.put(ReadyItContract.ReadyitEntry.LIKES, (int)dataHolder.likes);
 //        contentValues.put(ReadyItContract.ReadyitEntry.AUTHOR, dataHolder.data.author);
 //        contentValues.put(ReadyItContract.ReadyitEntry.PARENT_ID, dataHolder.data.parentId);
 //        contentValues.put(ReadyItContract.ReadyitEntry.SCORE, dataHolder.data.score);
@@ -120,6 +121,15 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         ContentValues conValues = new ContentValues();
         String selectionClause = ReadyItContract.ReadyitEntry._ID + " ='" + data.id + "'";
         conValues.put(ReadyItContract.ReadyitEntry.IS_SUBSCRIBED, data.hasChecked);
+        int rowsUpdated = context.getContentResolver().update(ReadyItContract.ReadyitEntry.CONTENT_URI, conValues, selectionClause, null);
+        return rowsUpdated;
+    }
+
+    public int updateLikeCount(SubredditListViewModel data) {
+        ContentValues conValues = new ContentValues();
+        String selectionClause = ReadyItContract.ReadyitEntry._ID + " ='" + data.id + "'";
+        conValues.put(ReadyItContract.ReadyitEntry.LIKES, data.likes);
+        conValues.put(ReadyItContract.ReadyitEntry.UP, data.up);
         int rowsUpdated = context.getContentResolver().update(ReadyItContract.ReadyitEntry.CONTENT_URI, conValues, selectionClause, null);
         return rowsUpdated;
     }
@@ -161,6 +171,7 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
 
         return isMarked;
     }
+
 
     public boolean isTableNotEmpty(String tableName, SQLiteDatabase db) {
         String count = "SELECT count(*) FROM " + tableName;
