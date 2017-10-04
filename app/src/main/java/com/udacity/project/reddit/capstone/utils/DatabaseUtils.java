@@ -26,11 +26,11 @@ public class DatabaseUtils {
                     + ReadyitEntry.URL + " TEXT NOT NULL,"
                     + ReadyitEntry.KIND + " VARCHAR NOT NULL,"
                     + ReadyitEntry.SUBS_COUNT + " INTEGER NOT NULL DEFAULT 0,"
-                    + ReadyitEntry.IS_SUBSCRIBED
-                    + " BOOLEAN NOT NULL DEFAULT 1,"
+                    + ReadyitEntry.USER_IS_SUBSCRIBER + " BOOLEAN DEFAULT 1,"
                     + ReadyitEntry.CREATED_UTC + " DATETIME NOT NULL,"
                     + "UNIQUE (" + ReadyitEntry._ID + ") ON CONFLICT REPLACE"
                     + " )";
+
 
     public static final String CREATE_TABLE_SUBREDDIT_DETAIL =
             "CREATE TABLE " + TABLE_DETAIL_SUBREDDIT
@@ -40,11 +40,11 @@ public class DatabaseUtils {
                     + ReadyitEntry.NAME + " TEXT NOT NULL, "
                     + ReadyitEntry.SUBREDDIT_TITLE + " TEXT NOT NULL, "
                     + ReadyitEntry.THUMB_URL + " TEXT NOT NULL,"
+                    + ReadyitEntry.USER_IS_SUBSCRIBER + " BOOLEAN DEFAULT 1,"
                     + ReadyitEntry.URL + " TEXT NOT NULL,"
                     + ReadyitEntry.SUBREDDIT_ID + " VARCHAR NOT NULL,"
                     + ReadyitEntry.DOWN + " INTEGER NOT NULL DEFAULT 0,"
                     + ReadyitEntry.LIKES + " INTEGER ,"
-                    + ReadyitEntry.IS_SUBSCRIBED + " BOOLEAN NOT NULL DEFAULT 0,"
                     + ReadyitEntry.SUBREDDIT_NAME + " TEXT NOT NULL,"
                     + ReadyitEntry.CREATED_UTC + " DATETIME NOT NULL,"
                     + ReadyitEntry.COMMENTS_COUNT + " INTEGER NOT NULL DEFAULT 0,"
@@ -54,14 +54,14 @@ public class DatabaseUtils {
     public static final String CREATE_TABLE_COMMENTS_TITLE =
             "CREATE TABLE " + TABLE_COMMENTS_TITLE
                     + " ("
+                    + ReadyitEntry.KIND + " TEXT NOT NULL,"
                     + ReadyitEntry._ID + " VARCHAR  PRIMARY KEY, "
                     + ReadyitEntry.UP + "  INTEGER NOT NULL DEFAULT 0, "
                     + ReadyitEntry.TITLE + " TEXT NOT NULL, "
                     + ReadyitEntry.MAIN_TITLE + " TEXT NOT NULL, "
                     + ReadyitEntry.NAME + " TEXT NOT NULL,"
                     + ReadyitEntry.SUBREDDIT_ID + " VARCHAR NOT NULL,"
-                    + ReadyitEntry.DOWN + " INTEGER NOT NULL DEFAULT 0,"
-                    + ReadyitEntry.COMMENTS_COUNT + " INTEGER NOT NULL DEFAULT 0,"
+                    + ReadyitEntry.CREATED_UTC + " DATETIME NOT NULL,"
                     + "UNIQUE (" + ReadyitEntry._ID + ") ON CONFLICT REPLACE"
                     + " )";
 
@@ -71,18 +71,17 @@ public class DatabaseUtils {
                     + ReadyitEntry._ID + " VARCHAR  PRIMARY KEY, "
                     + ReadyitEntry.DEPTH + "  INTEGER NOT NULL DEFAULT 0, "
                     + ReadyitEntry.SUBREDDIT_ID + " VARCHAR NOT NULL,"
-                    + ReadyitEntry.LIKES + " INTEGER NOT NULL DEFAULT 0,"
-
                     + ReadyitEntry.AUTHOR + " TEXT NOT NULL, "
                     + ReadyitEntry.PARENT_ID + " TEXT NOT NULL, "
                     + ReadyitEntry.SCORE + " INTEGER NOT NULL DEFAULT 0,"
                     + ReadyitEntry.BODY + " TEXT NOT NULL,"
                     + ReadyitEntry.DOWN + " INTEGER NOT NULL DEFAULT 0,"
                     + ReadyitEntry.UP + " INTEGER NOT NULL DEFAULT 0,"
-
                     + ReadyitEntry.SUBREDDIT_NAME + " TEXT NOT NULL,"
                     + ReadyitEntry.NAME + " TEXT NOT NULL,"
                     + ReadyitEntry.LINK_ID + " TEXT NOT NULL,"
+                    + ReadyitEntry.KIND + " TEXT NOT NULL,"
+                    + ReadyitEntry.CREATED_UTC + " DATETIME NOT NULL,"
                     + "UNIQUE (" + ReadyitEntry._ID + ") ON CONFLICT REPLACE"
                     + " )";
 

@@ -113,25 +113,25 @@ public class SubredditDetailFragment extends Fragment {
 
     }
 
-    private void connectApiClient() {
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<List<GetCommentsModel>> call = apiInterface.doGetComments("/r/" + data.subreddit_name + "/comments/"
-                + data.id + "/.json");
-
-        call.enqueue(new Callback<List<GetCommentsModel>>() {
-            @Override
-            public void onResponse(Call<List<GetCommentsModel>> call, Response<List<GetCommentsModel>> response) {
-                response.isSuccessful();
-                List<GetCommentsModel> commentsModel = response.body();
-
-            }
-
-            @Override
-            public void onFailure(Call<List<GetCommentsModel>> call, Throwable t) {
-
-            }
-        });
-    }
+//    private void connectApiClient() {
+//        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+//        Call<List<GetCommentsModel>> call = apiInterface.doGetComments("/r/" + data.subreddit_name + "/comments/"
+//                + data.id + "/.json");
+//
+//        call.enqueue(new Callback<List<GetCommentsModel>>() {
+//            @Override
+//            public void onResponse(Call<List<GetCommentsModel>> call, Response<List<GetCommentsModel>> response) {
+//                response.isSuccessful();
+//                List<GetCommentsModel> commentsModel = response.body();
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<GetCommentsModel>> call, Throwable t) {
+//
+//            }
+//        });
+//    }
 
     private void getReplies() {
         OkHttpClient client = new OkHttpClient();

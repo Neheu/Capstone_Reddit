@@ -31,7 +31,7 @@ public class ReadyItContract {
         public static final String TITLE = "title";
         public static final String NAME = "name";
         public static final String URL = "url";
-        public static final String IS_SUBSCRIBED = "is_subscribed";
+//        public static final String IS_SUBSCRIBED = "is_subscribed";
         public static final String CREATED_UTC = "created_utc";
         public static final String SUBS_COUNT = "subs_count";
         public static final String SUBREDDIT_ID = "subreddit_id";
@@ -75,5 +75,6 @@ public class ReadyItContract {
         public static final String LINK_ID = "link_id";
 
         public static final String MAIN_TITLE = "selftext";
+        public static final String USER_IS_SUBSCRIBER = "user_is_subscriber";
     }
 }

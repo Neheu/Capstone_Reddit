@@ -41,9 +41,9 @@ public class Constants {
     public static final String AUTH_URL = "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
             "&response_type=code&state=%s&redirect_uri=%s&" +
             "duration=permanent&scope=edit, flair, history, modconfig, modflair, modlog, modposts, modwiki, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote, wikiedit, wikiread";
-    public static final String REDIRECT_URI =
-            "http://www.example.com/redirect";
+    public static final String REDIRECT_URI =  "http://www.example.com/redirect";
     public static final String STATE = "RANDON_STATE_STRING";
+    public static String SCOPE = "identity edit flair";
 
     public static final String ACCESS_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
     public static final String PREFRENCE_AFTER = "after";
@@ -65,7 +65,7 @@ public class Constants {
     }
 
 
-    public static String refreshAccessToken(final Context con, final GetRefreshedToken tokenInf) {
+    public static String refreshAccessToken(final Context con, final GetRefreshedToken tokenInf, final String apiTag) {
         OkHttpClient client = new OkHttpClient();
         String authString = Constants.CLIENT_ID + ":";
         String encodedAuthString = Base64.encodeToString(authString.getBytes(),
@@ -97,7 +97,7 @@ public class Constants {
                     long millis = date.getTime();
                     edit.putLong(PRERENCES_TOKEN_REFRESH_TIME, millis);
                     edit.apply();
-                    tokenInf.onTokenRefreshed(getToken(con));
+                    tokenInf.onTokenRefreshed(getToken(con),apiTag);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

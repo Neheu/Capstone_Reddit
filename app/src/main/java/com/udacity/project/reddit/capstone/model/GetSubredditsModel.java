@@ -214,15 +214,8 @@ public class GetSubredditsModel {
         public String submissionType;
         @SerializedName("user_is_subscriber")
         @Expose
-        public Object userIsSubscriber;
+        public boolean userIsSubscriber;
 
-        public boolean isSubscribed = false;
-        //for chrckbox
-        public boolean hasChecked = false;
-
-        public void isSelected(boolean bol) {
-            hasChecked = bol;
-        }
     }
 
     public class Kind {

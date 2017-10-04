@@ -86,7 +86,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 //                                if (dbHelper.isTableNotEmpty(DatabaseUtils.TABLE_SUBS_SUBREDDIT, db)) {
 //
 //                                } else
-                                    startActivity(new Intent(SplashScreenActivity.this, SubRedditsActivity.class).putExtra("for_my_subreddits", false));
+                                    startActivity(new Intent(SplashScreenActivity.this, MineSubredditsActivity.class));
                             else
 
                                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));

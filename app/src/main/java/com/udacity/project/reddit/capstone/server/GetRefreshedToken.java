@@ -5,5 +5,5 @@ package com.udacity.project.reddit.capstone.server;
  */
 
 public interface GetRefreshedToken {
-    public void onTokenRefreshed(String token);
+    public void onTokenRefreshed(String token,String tag);
 }

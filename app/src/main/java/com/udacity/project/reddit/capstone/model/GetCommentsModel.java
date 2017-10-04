@@ -244,9 +244,9 @@ public class GetCommentsModel {
         @SerializedName("author")
         @Expose
         public String author;
-        //        @SerializedName("created_utc")
-//        @Expose
-//        public Integer createdUtc;
+        @SerializedName("created_utc")
+        @Expose
+        public Integer createdUtc;
         @SerializedName("subreddit_name_prefixed")
         @Expose
         public String subredditNamePrefixed;
@@ -333,35 +333,22 @@ public class GetCommentsModel {
         @Expose
         public Data data;
     }
-    static Retrofit retrofit = null;
-    public static Retrofit getClient() {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(GetCommentsModel.Data_.class, new GetCommentsModel.ReplyDeserializer())
-                .setLenient()
-                .create();
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(Constants.API_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-        }
-        return retrofit;
-    }
-    public static class ReplyDeserializer implements JsonDeserializer<GetCommentsModel.Data_> {
-        GetCommentsModel.Data_ replyState;
+
+    public static class ReplyDeserializer implements JsonDeserializer<Data_> {
+        Data_ replyState;
 
         @Override
-        public GetCommentsModel.Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Data_ deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                replyState = new Gson().fromJson(json, GetCommentsModel.Data_.class);
+                replyState = new Gson().fromJson(json, Data_.class);
                 JsonObject jsonObject = json.getAsJsonObject();
                 if (jsonObject.has("replies")) {
                     JsonElement elem = jsonObject.get("replies");
 
                     if (elem != null && !elem.isJsonNull()) {
                         if (elem.isJsonObject()) {
-                           Reply rep = new Gson().fromJson(elem, GetCommentsModel.Reply.class);
-                           // Reply rep = context.deserialize(jsonObject.get("replies"), GetCommentsModel.Reply.class);
+                            Reply rep = new Gson().fromJson(elem, Reply.class);
+                            // Reply rep = context.deserialize(jsonObject.get("replies"), GetCommentsModel.Reply.class);
                             replyState.setReply(rep);
                         } else {
                             replyState.setReply(null);

@@ -30,6 +30,7 @@ import com.udacity.project.reddit.capstone.server.ApiInterface;
 import com.udacity.project.reddit.capstone.server.GetRefreshedToken;
 import com.udacity.project.reddit.capstone.utils.Constants;
 import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
+import com.udacity.project.reddit.capstone.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -99,7 +100,8 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
 
         @Override
         protected Void doInBackground(Void... params) {
-            Constants.refreshAccessToken(HomePageActivity.this, HomePageActivity.this);
+            if(new NetworkUtils().isOnline(HomePageActivity.this))
+            Constants.refreshAccessToken(HomePageActivity.this, HomePageActivity.this,"detail_subreddit");
             return null;
         }
     }
@@ -157,7 +159,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     }
     private void connectApiClient(String token) {
         apiInterface = getClient().create(ApiInterface.class);
-        Call call = apiInterface.getSubredditList("bearer " + token, subreddit_url+".json");
+        Call call = apiInterface.doGetSubredditList("bearer " + token, subreddit_url+".json");
 
         call.enqueue(new Callback() {
             @Override
@@ -205,7 +207,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
                 holder.id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
                 holder.up = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.UP));
                 holder.down = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.DOWN));
-                holder.is_subscribed = Boolean.valueOf(subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.IS_SUBSCRIBED)));
+                holder.is_subscribed = Boolean.valueOf(subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER)));
                 holder.subreddit_name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_NAME));
                 holder.thumb_url = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.URL));
                 holder.name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.NAME));
@@ -235,7 +237,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     }
 
     @Override
-    public void onTokenRefreshed(String token) {
+    public void onTokenRefreshed(String token,String tag) {
         connectApiClient(token);
     }
 }

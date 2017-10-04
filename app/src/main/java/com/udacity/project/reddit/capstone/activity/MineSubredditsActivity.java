@@ -9,8 +9,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -54,14 +53,17 @@ import retrofit2.Response;
 
 import static com.udacity.project.reddit.capstone.utils.DatabaseUtils.TABLE_SUBS_SUBREDDIT;
 
-public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SubredditsAdapters.onSubredditSelectListener, SwipeRefreshLayout.OnRefreshListener,
+
+public class MineSubredditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SubredditsAdapters.onSubredditSelectListener, SwipeRefreshLayout.OnRefreshListener,
         GetRefreshedToken {
     private ApiInterface apiInterface;
     private RecyclerView recycleViewSubreddit;
-
+    @BindView(R.id.btn_subs_now)
+    Button btnSubsNow;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    View parentLayout;
+    @BindView(R.id.no_subs_subreddit_layout)
+    LinearLayout no_subscribe_layout;
     private Cursor cursor;
     private RedyItSQLiteOpenHelper dbHelper;
     private SharedPreferences preferences;
@@ -74,8 +76,8 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     private NetworkUtils networkUtils;
     private List<String> sub = new ArrayList<>(), unsub = new ArrayList<>();
     private Snackbar snackbar;
-    @BindView(R.id.no_subs_subreddit_layout)
-    LinearLayout no_subscribe_layout;
+    @BindView(R.id.parent_layout)
+    View parentLayout;
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
@@ -88,29 +90,19 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         preferences = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
         editor = preferences.edit();
         networkUtils = new NetworkUtils();
-        parentLayout = findViewById(R.id.parent_layout);
-        snackbar = Snackbar
-                .make(parentLayout, "Subscribe Subreddits!", Snackbar.LENGTH_INDEFINITE);
+
         recycleViewSubreddit = (RecyclerView) findViewById(R.id.rv_subreddit);
         LinearLayoutManager gridLayoutManager = new LinearLayoutManager(this);
         recycleViewSubreddit.setLayoutManager(gridLayoutManager);
         dbHelper = new RedyItSQLiteOpenHelper(this);
         swipeRefreshLayout.setOnRefreshListener(this);
-        no_subscribe_layout.setVisibility(View.GONE);
-        //Connect to ReteoFit and get subreddits
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        if (preferences.contains(Constants.PREFRENCE_AFTER)) {
-            after = preferences.getString(Constants.PREFRENCE_AFTER, "");
-            before = preferences.getString(Constants.PREFRENCE_BEFORE, "");
-        }
+        snackbar = Snackbar
+                .make(parentLayout, "UnSubscribe Subreddits!", Snackbar.LENGTH_INDEFINITE);
         swipeRefreshLayout.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
-                                        if (networkUtils.isOnline(SubRedditsActivity.this))
+                                        if (networkUtils.isOnline(MineSubredditsActivity.this))
                                             new GetSubredditsList().execute();
                                         else
                                             updateList();
@@ -118,24 +110,24 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                                 }
         );
 
-        adapters = new SubredditsAdapters(true, SubRedditsActivity.this, recycleViewSubreddit, favList, SubRedditsActivity.this, SubRedditsActivity.this);
+        adapters = new SubredditsAdapters(false, MineSubredditsActivity.this, recycleViewSubreddit, favList, MineSubredditsActivity.this, MineSubredditsActivity.this);
 
 
         adapters.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                if (networkUtils.isOnline(SubRedditsActivity.this))
-                    connectApiClient("/subreddits/popular.json?limit=10&after=" + after);
+                if (networkUtils.isOnline(MineSubredditsActivity.this))
+                    connectApiClient("/subreddits/mine/subscriber.json");
                 else
                     updateList();
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateList();
+        btnSubsNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MineSubredditsActivity.this, SubRedditsActivity.class));
+            }
+        });
     }
 
     private String token = "";
@@ -143,15 +135,24 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     @Override
     public void onTokenRefreshed(String token, String tag) {
         this.token = token;
-        connectApiClient("/subreddits/popular.json");
+        connectApiClient("/subreddits/mine/subscriber.json");
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @Override
+    public void checkCount(int count, HashMap<String, SubscribeRedditsViewModel> data) {
+        if (count > 0) {
+            showSnackbar(data);
+        } else
+            snackbar.dismiss();
     }
 
     private class GetSubredditsList extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
-            Constants.refreshAccessToken(SubRedditsActivity.this, SubRedditsActivity.this, "subreddits_list");
+            Constants.refreshAccessToken(MineSubredditsActivity.this, MineSubredditsActivity.this, "subreddits_list");
             return null;
         }
     }
@@ -160,8 +161,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         Map<String, Object> map = new HashMap<>();
         map.put("after", after);
         map.put("limit", "10");
+        map.put("count", "0");
+        map.put("before", before);
         apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call call = apiInterface.doGetSubredditsListResources("bearer " + token, url, map);
+        Call call = apiInterface.doGetMineSubreddits("bearer " + token, url, map);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -174,10 +177,12 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
                 //get and set subreddits into a list
                 List<GetSubredditsModel.Child> list = model.data.children;
+
+
                 if (list != null && list.size() > 0) {
                     for (GetSubredditsModel.Child data : list) {
+                        ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                         if (!dbHelper.isAlreadyInserted(data.data.id)) {
-                            ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                             dbHelper.insertSubSubreddits(data);
                         }
                     }
@@ -191,7 +196,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
                 } else if (favList.size() == 0) {
-                    updateList();
+                     updateList();
                 }
             }
 
@@ -204,7 +209,11 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
     private void populateSubscribedRedditList(Cursor subredditCursor) {
         favList.clear();
-        if (cursor != null && cursor.moveToFirst())
+        if(cursor.getCount()<=0){
+                no_subscribe_layout.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        else if (cursor != null && cursor.moveToFirst())
             do {
                 SubscribeRedditsViewModel holder = new SubscribeRedditsViewModel();
                 holder.id = cursor.getString(cursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
@@ -221,11 +230,16 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
 
             while (cursor.moveToNext());
+
         recycleViewSubreddit.setAdapter(adapters);
         adapters.notifyDataSetChanged();
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateList();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -235,43 +249,11 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-    @Override
-    public void checkCount(int count, HashMap<String, SubscribeRedditsViewModel> data) {
-        if (count > 0) {
-            showSnackbar(data);
-
-        } else
-            snackbar.dismiss();
-    }
-
-
-    @Override
-    public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(true);
-        if (networkUtils.isOnline(SubRedditsActivity.this))
-            updateList();
-        else
-            connectApiClient("/subreddits/popular.json?limit=10&before=" + before + "&after=" + after);
-
-
-    }
-
-    private void updateList() {
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
-        cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
-        populateSubscribedRedditList(cursor);
-        // stopping swipe refresh
-        swipeRefreshLayout.setRefreshing(false);
-    }
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.my_subreddits:
-                startActivity(new Intent(SubRedditsActivity.this, MineSubredditsActivity.class));
+                startActivity(new Intent(MineSubredditsActivity.this, SubRedditsActivity.class));
                 return true;
 
 
@@ -280,8 +262,28 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     }
 
     @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(true);
+        if (networkUtils.isOnline(MineSubredditsActivity.this))
+            updateList();
+        else
+            connectApiClient("/subreddits/mine/subscriber.json");
+
+
+    }
+
+    private void updateList() {
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
+        cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER+" ='1'", null, null);
+        populateSubscribedRedditList(cursor);
+        // stopping swipe refresh
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+
+    @Override
     public void onClick(SubscribeRedditsViewModel dataHolder) {
-        startActivity(new Intent(SubRedditsActivity.this, HomePageActivity.class).putExtra("data", dataHolder));
+        startActivity(new Intent(MineSubredditsActivity.this, HomePageActivity.class).putExtra("data", dataHolder));
 
     }
 
@@ -291,7 +293,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
             public void onClick(View v) {
                 for (String key : data.keySet()) {
                     String name = data.get(key).name;
-                    updateSubscription("sub", SubRedditsActivity.this, name, data.get(key).id);
+                    updateSubscription("unsub", MineSubredditsActivity.this, name, data.get(key).id);
 
                 }
             }
@@ -314,7 +316,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                         Log.d(">>", "Success responseCode:" + response.code());
                         if (response.code() == 200) {
                             ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
-                            dbHelper.updateSubscribeReddits(id, "1");
+                            dbHelper.updateSubscribeReddits(id,"0");
                             updateList();
                         }
                     }
@@ -325,5 +327,4 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                     }
                 });
     }
-
 }

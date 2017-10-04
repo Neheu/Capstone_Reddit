@@ -6,7 +6,6 @@ import android.os.Parcelable;
 /**
  * Created by Neha on 23-08-2017.
  */
-
 public class SubscribeRedditsViewModel implements Parcelable {
     public String id;
     public String title;
@@ -15,7 +14,7 @@ public class SubscribeRedditsViewModel implements Parcelable {
     public String display_name;
     public String after;
     public String before;
-    public boolean hasChecked;
+    public boolean isSubscribed;
     public String subreddit_id;
     public String kind;
     public int subCount;
@@ -29,7 +28,7 @@ public class SubscribeRedditsViewModel implements Parcelable {
         display_name = in.readString();
         after = in.readString();
         before = in.readString();
-        hasChecked = in.readByte() != 0;
+        isSubscribed = in.readByte() != 0;
         subreddit_id = in.readString();
         kind = in.readString();
         subCount = in.readInt();
@@ -52,7 +51,7 @@ public class SubscribeRedditsViewModel implements Parcelable {
     };
 
     public void isSelected(boolean bol) {
-        hasChecked = bol;
+        isSubscribed = bol;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class SubscribeRedditsViewModel implements Parcelable {
         dest.writeString(display_name);
         dest.writeString(after);
         dest.writeString(before);
-        dest.writeByte((byte) (hasChecked ? 1 : 0));
+        dest.writeByte((byte) (isSubscribed ? 1 : 0));
         dest.writeString(subreddit_id);
         dest.writeString(kind);
         dest.writeInt(subCount);

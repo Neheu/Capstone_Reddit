@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,48 +58,88 @@ public class LoginActivity extends AppCompatActivity {
 
     private static ProgressDialog progressDialog;
 
-    @BindView(R.id.btn_user_login)
-    Button btnLoggin;
+    //    @BindView(R.id.btn_user_login)
+//    Button btnLoggin;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
+    @BindView(R.id.wv_login)
+    WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_new);
 //        new LoginAsync().execute();
         ButterKnife.bind(this);
         prefs = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
         editor = prefs.edit();
+        String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
+        webView.loadUrl(url);
+//        btnLoggin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).putExtra("for_my_subreddits", false);
+//                startActivity(intent);
+//            }
+//        });
 
-        btnLoggin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String url = String.format(Constants.AUTH_URL, Constants.CLIENT_ID, STATE, REDIRECT_URI);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).putExtra("for_my_subreddits", false);
-                startActivity(intent);
-            }
-        });
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new myWebClient());
     }
+
+    public class myWebClient extends WebViewClient {
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            // TODO Auto-generated method stub
+            super.onPageStarted(view, url, favicon);
+
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            // TODO Auto-generated method stub
+            if (url.startsWith("http://www.example.com")) {
+                //Means everything is good
+                Uri uri = Uri.parse(url);
+                if (uri.getQueryParameter("error") != null) {
+                    String error = uri.getQueryParameter("error");
+                } else {
+                    String state = uri.getQueryParameter("state");
+                    if (state.equals(Constants.STATE)) {
+                        String code = uri.getQueryParameter("code");
+                        getAccessToken(code);
+
+                        webView = null;
+                    }
+                }
+                return false;
+            }
+            view.loadUrl(url);
+            return true;
+
+        }
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (getIntent() != null && getIntent().getAction() != null)
-            if (getIntent().getAction().equals(Intent.ACTION_VIEW)) {
-                Uri uri = getIntent().getData();
-                if (uri.getQueryParameter("error") != null) {
-                    String error = uri.getQueryParameter("error");
-                    Log.e("LOGIN. ", "An error has occurred : " + error);
-                } else {
-                    String state = uri.getQueryParameter("state");
-                    if (state.equals(STATE)) {
-                        String code = uri.getQueryParameter("code");
-                        getAccessToken(code);
-                    }
-                }
-            }
+//        if (getIntent() != null && getIntent().getAction() != null)
+//            if (getIntent().getAction().equals(Intent.ACTION_VIEW)) {
+//                Uri uri = getIntent().getData();
+//                if (uri.getQueryParameter("error") != null) {
+//                    String error = uri.getQueryParameter("error");
+//                    Log.e("LOGIN. ", "An error has occurred : " + error);
+//                } else {
+//                    String state = uri.getQueryParameter("state");
+//                    if (state.equals(STATE)) {
+//                        String code = uri.getQueryParameter("code");
+//                        getAccessToken(code);
+//                    }
+//                }
+//            }
     }
 
     private void getAccessToken(String code) {
@@ -135,8 +178,9 @@ public class LoginActivity extends AppCompatActivity {
                     long millis = date.getTime();
                     editor.putLong(Constants.PRERENCES_TOKEN_REFRESH_TIME, millis);
                     editor.apply();
-                    startActivity(new Intent(LoginActivity.this, SubRedditsActivity.class));
                     finish();
+                    startActivity(new Intent(LoginActivity.this, MineSubredditsActivity.class));
+
 
 
                 } catch (JSONException e) {

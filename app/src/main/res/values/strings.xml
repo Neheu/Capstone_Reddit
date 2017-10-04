@@ -26,5 +26,10 @@
     <string name="down_vote">dislike subreddit</string>
     <string name="comment">Comment</string>
     <string name="title_activity_subreddit_detail">SubredditDetailActivity</string>
+    <string name="my_subreddits">My Subreddits</string>
+    <string name="title_activity_mine_subreddits">MineSubredditsActivity</string>
+    <string name="no_subscribed_subreddit_select_and_subscribe">No subreddit is subscribed.</string>
+    <string name="subscribe_now">Subscribe Now</string>
+    <string name="title_activity_reply">ReplyActivity</string>
 
 </resources>
