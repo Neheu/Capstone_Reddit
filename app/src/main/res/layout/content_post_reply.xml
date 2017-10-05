@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.udacity.project.reddit.capstone.activity.PostReplyActivity"
+    tools:showIn="@layout/activity_post_reply"
+    android:orientation="vertical">
+    <EditText android:id="@+id/txt_post_comment"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:padding="16dp"
+        android:hint="@string/write_comment"
+        />
+    <Button
+        android:id="@+id/btn_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/post_now"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

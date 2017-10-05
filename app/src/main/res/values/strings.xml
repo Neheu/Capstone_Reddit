@@ -31,5 +31,10 @@
     <string name="no_subscribed_subreddit_select_and_subscribe">No subreddit is subscribed.</string>
     <string name="subscribe_now">Subscribe Now</string>
     <string name="title_activity_reply">ReplyActivity</string>
+    <string name="title_activity_post_reply">PostReplyActivity</string>
+    <string name="write_comment">Write Reply</string>
+    <string name="post_now">Post</string>
+    <string name="posted_successfully">Replyposted successfully</string>
+    <string name="error_occurred">An error occurred</string>
 
 </resources>

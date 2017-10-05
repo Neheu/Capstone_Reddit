@@ -61,5 +61,13 @@ public interface ApiInterface {
                                               @Field("skip_initial_defaults") boolean skip_initial_defaults,
                                               @Field("sr") String fullName
     );
+    @FormUrlEncoded
+    @POST("/api/comment")
+    @Headers("User-Agent: Sample App")
+    Call<ResponseBody> doPostReply(@Header(Constants.AUTHORIZATION) String authorization,
+                                           @Field("api_type") String action,
+                                           @Field("text") String mesg,
+                                           @Field("thing_id") String fullName
+    );
 
 }
