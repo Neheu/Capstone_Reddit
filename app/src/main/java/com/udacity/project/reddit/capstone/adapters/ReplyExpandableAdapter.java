@@ -38,7 +38,7 @@ public class ReplyExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        if (_listDataChild == null || _listDataChild.size() == 0)
+        if (_listDataChild == null && _listDataChild.size() == 0)
             return 0;
         else
             return this._listDataChild.get(

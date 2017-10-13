@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -14,11 +16,14 @@ import android.widget.ExpandableListView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.udacity.project.reddit.capstone.R;
+import com.udacity.project.reddit.capstone.adapters.CommentsAdapter;
 import com.udacity.project.reddit.capstone.adapters.ReplyExpandableAdapter;
 import com.udacity.project.reddit.capstone.adapters.SubredditDetailListAdapter;
 import com.udacity.project.reddit.capstone.db.ReadyItContract;
 import com.udacity.project.reddit.capstone.db.ReadyitProvider;
 import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
+import com.udacity.project.reddit.capstone.model.CommentChildModel;
+import com.udacity.project.reddit.capstone.model.CommentsParentModel;
 import com.udacity.project.reddit.capstone.model.GetCommentsModel;
 import com.udacity.project.reddit.capstone.model.ReplyViewModel;
 import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
@@ -48,12 +53,17 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     private ArrayList<ReplyViewModel> repDataParent = new ArrayList<>();
     private ArrayList<ReplyViewModel> repDataChild = new ArrayList<>();
     HashMap<String, List<ReplyViewModel>> listDataChild = new HashMap<>();
+    HashMap<String, List<ReplyViewModel>> listParentData = new HashMap<>();
     List<String> listParentHeader = new ArrayList<>();
-    @BindView(R.id.lvExp)
-    ExpandableListView expListView;
+    List<String> listChildHeader = new ArrayList<>();
+    //    @BindView(R.id.lvExp)
+//    ExpandableListView expListView;
     @BindView(R.id.fab)
     FloatingActionButton postBtn;
-
+    @BindView(R.id.rv_comment)
+    RecyclerView rvComments;
+    private CommentsAdapter commentsAdapter;
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +71,23 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         setContentView(R.layout.activity_reply);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
+
+        rvComments.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        rvComments.setLayoutManager(mLayoutManager);
         dbHelper = new RedyItSQLiteOpenHelper(this);
         intent = getIntent();
         subreddit_id = intent.getStringExtra("id");
         subreddit_name = intent.getStringExtra("subreddit_name");
-        ButterKnife.bind(this);
+        commentsAdapter = new CommentsAdapter(this, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = rvComments.getChildPosition(v);
+                commentsAdapter.toggleGroup(position);
+            }
+        });
         new RefreshToken().execute();
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +95,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                 startActivity(new Intent(ReplyActivity.this, PostReplyActivity.class).putExtra("name", fullParentName));
             }
         });
+
 
     }
 
@@ -145,15 +168,19 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
 
         return commentsList;
     }
+
     List<GetCommentsModel.Child> child = new ArrayList<>();
+    CommentChildModel content;
+    List<CommentsParentModel> comments = new ArrayList<>();
 
     private void ReplyReccur(List<GetCommentsModel.Child> commentsOnly) {
         for (GetCommentsModel.Child comm : commentsOnly) {
             // GetCommentsModel.Data_ data = comm.data;
             if (comm != null) {
                 GetCommentsModel.Reply reply = comm.data.mReplyData;
+
+                dbHelper.insertComments(comm);
                 if (reply != null) {
-                    dbHelper.insertComments(comm);
                     child = reply.data.children;
                     ReplyReccur(child);
                 }
@@ -182,8 +209,11 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                 holder.up = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.UP));
                 holder.name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.NAME));
                 holder.kind = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.KIND));
-
+                //holder.author = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.AUTHOR));
                 repTitle.add(holder);
+                content = new CommentChildModel(holder.body);
+                commentsAdapter.add(content);
+
             }
 
 
@@ -196,6 +226,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     }
 
     private String fullParentName;
+    private int childCount = 0;
 
     private void populateReplyListParent() {
         listDataChild.clear();
@@ -223,52 +254,62 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                     holder.link_id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.LINK_ID));
                     holder.kind = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.KIND));
                     repDataParent.add(holder);
-                   // listDataChild.put(holder.body, repDataParent);
+                    listParentData.put(holder.body, repDataParent);
                     listParentHeader.add(holder.body);
+                    if (comments.size() == 0) {
+                        childCount = 0;
+                    } else childCount = comments.size() - 1;
 
+                    comments.add(new CommentsParentModel(holder.author, holder.body));
+                    populateReplyListChild(holder, childCount);
 
+                    childCount++;
                 }
                 while (subredditCursor.moveToNext());
-            populateReplyListChild();
-        }
 
+        }
+        rvComments.setAdapter(commentsAdapter);
+
+        commentsAdapter.addAll(comments);
+        commentsAdapter.notifyDataSetChanged();
 //        recycleViewSubreddit.setAdapter(adapters);
 //        adapters.notifyDataSetChanged();
 
     }
 
-    private void populateReplyListChild() {
+    private void populateReplyListChild(ReplyViewModel rep, int position) {
         Cursor subredditCursor = null;
-        for (ReplyViewModel rep : repDataParent) {
-            ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS);
-            String parent_id = rep.kind + "_" + rep.id;
-            subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + parent_id + "'", null, null);
+//        for (ReplyViewModel rep : repDataParent) {
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS);
+        String parent_id = rep.kind + "_" + rep.id;
+        subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + parent_id + "'", null, null);
 
-            if (subredditCursor != null && subredditCursor.moveToFirst())
-                do {
-                    ReplyViewModel holder = new ReplyViewModel();
-                    holder.id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
-                    holder.subreddi_id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_ID));
-                    holder.author = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.AUTHOR));
-                    holder.name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.NAME));
-                    holder.body = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.BODY));
-                    holder.down = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.DOWN));
-                    holder.up = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.UP));
-                    holder.subreddit_name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_NAME));
+        if (subredditCursor != null && subredditCursor.moveToFirst())
+            do {
+                ReplyViewModel holder = new ReplyViewModel();
+                holder.id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
+                holder.subreddi_id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_ID));
+                holder.author = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.AUTHOR));
+                holder.name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.NAME));
+                holder.body = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.BODY));
+                holder.down = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.DOWN));
+                holder.up = subredditCursor.getInt(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.UP));
+                holder.subreddit_name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.SUBREDDIT_NAME));
 
-                    repDataChild.add(holder);
-                    listDataChild.put(holder.body, repDataChild);
-                  //  listParentHeader.add(holder.body);
+                repDataChild.add(holder);
+                listDataChild.put(holder.body, repDataChild);
+                listChildHeader.add(holder.body);
+                comments.get(position).addChild(new CommentsParentModel(holder.author, holder.body));
+            }
 
-                }
-
-                while (subredditCursor.moveToNext());
-        }
-
-
-        expListView.setAdapter(new ReplyExpandableAdapter(this, listParentHeader, listDataChild));
-
+            while (subredditCursor.moveToNext());
 
     }
+
+
+//        expListView.setAdapter(new ReplyExpandableAdapter(this, listParentHeader, listDataChild));
+
+
+//    }
 
 }

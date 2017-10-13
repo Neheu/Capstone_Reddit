@@ -238,7 +238,11 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
     @Override
     protected void onResume() {
         super.onResume();
-        updateList();
+        if(dbHelper.isTableNotEmpty(DatabaseUtils.TABLE_SUBS_SUBREDDIT,dbHelper.getWritableDatabase())&&networkUtils.isOnline(MineSubredditsActivity.this))
+        {
+            swipeRefreshLayout.setRefreshing(true);
+            new GetSubredditsList().execute();
+        }
     }
 
     @Override
@@ -264,7 +268,7 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        if (networkUtils.isOnline(MineSubredditsActivity.this))
+        if (!networkUtils.isOnline(MineSubredditsActivity.this))
             updateList();
         else
             connectApiClient("/subreddits/mine/subscriber.json");
@@ -274,10 +278,15 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
 
     private void updateList() {
         ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
-        cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER+" ='1'", null, null);
-        populateSubscribedRedditList(cursor);
-        // stopping swipe refresh
-        swipeRefreshLayout.setRefreshing(false);
+
+            cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER+" ='1'", null, null);
+            populateSubscribedRedditList(cursor);
+            // stopping swipe refresh
+            swipeRefreshLayout.setRefreshing(false);
+
+no_subscribe_layout.setVisibility(View.GONE);
+
+
     }
 
 
