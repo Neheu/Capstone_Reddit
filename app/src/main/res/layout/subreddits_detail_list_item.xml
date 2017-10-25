@@ -42,8 +42,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             app:layout_constraintHorizontal_bias="0.62"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/card_view_child"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/card_view_child"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -53,8 +53,8 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/card_view_child"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/card_view_child"
             app:layout_constraintTop_toBottomOf="@+id/tv_title" />
 
         <TextView
@@ -68,7 +68,7 @@
             android:gravity="center"
             android:text="@string/share"
             app:layout_constraintBaseline_toBaselineOf="@+id/tv_comments"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/tv_comments"
@@ -81,7 +81,7 @@
             android:drawablePadding="8dp"
             android:text="@string/comment"
             android:contentDescription="@string/comment"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_detail" />
 
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:padding="8dp"
-            app:layout_constraintLeft_toRightOf="@+id/image_up_vote"
+            app:layout_constraintStart_toEndOf="@+id/image_up_vote"
             app:layout_constraintTop_toTopOf="@+id/tv_comments" />
 
         <ImageView
@@ -102,7 +102,7 @@
             android:contentDescription="@string/up_vote"
             android:src="@drawable/ic_arrow_upward"
             app:layout_constraintBottom_toBottomOf="@+id/tv_vote_count"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_vote_count"
             app:layout_constraintVertical_bias="0.0"
             />
@@ -114,7 +114,7 @@
             android:layout_marginStart="8dp"
             android:contentDescription="@string/down_vote"
             app:layout_constraintBottom_toBottomOf="@+id/tv_vote_count"
-            app:layout_constraintLeft_toRightOf="@+id/tv_vote_count"
+            app:layout_constraintStart_toEndOf="@+id/tv_vote_count"
             app:layout_constraintTop_toTopOf="@+id/tv_vote_count"
             app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/ic_arrow_down" />
@@ -126,7 +126,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:background="@color/icon_gray_color"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_comments" />
     </android.support.constraint.ConstraintLayout>
