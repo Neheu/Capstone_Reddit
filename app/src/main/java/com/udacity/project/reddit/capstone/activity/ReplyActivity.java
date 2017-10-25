@@ -45,7 +45,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReplyActivity extends AppCompatActivity implements GetRefreshedToken , LoaderManager.LoaderCallbacks<Cursor>{
+public class ReplyActivity extends AppCompatActivity implements GetRefreshedToken, LoaderManager.LoaderCallbacks<Cursor> {
     private ApiInterface apiInterface;
     private Intent intent;
     private String subredditName, subredditId;
@@ -69,7 +69,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     @BindView(R.id.tv_subreddit_url)
     TextView subredditTitle;
     private LinearLayoutManager mLayoutManager;
-    private int LOADER_ID=111;
+    private int LOADER_ID = 111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +88,11 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         subredditId = intent.getStringExtra(Constants.SUB_ID);
         subredditName = intent.getStringExtra(Constants.SUB_NAME);
         subredditTitle.setText(subredditName);
+        if (savedInstanceState != null) {
+            subredditId = savedInstanceState.getString(Constants.INTENT_REPLY);
+            getSupportLoaderManager().initLoader(LOADER_ID, null, ReplyActivity.this);
+        } else
+            new RefreshToken().execute();
         commentsAdapter = new CommentsAdapter(this, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +100,8 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                 commentsAdapter.toggleGroup(position);
             }
         });
-        new RefreshToken().execute();
+
+
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,9 +113,16 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Constants.INTENT_REPLY, subredditId);
+    }
+
+    @Override
     public void onTokenRefreshed(String token, String tag) {
         getComments(token);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -121,11 +134,12 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         }
         return true;
     }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = ReadyItContract.ReadyitEntry.CONTENT_URI;
         ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS_TITLE);
-        return new CursorLoader(this, uri, null,ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
+        return new CursorLoader(this, uri, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
     }
 
     @Override
@@ -190,7 +204,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                     }
                     List<GetCommentsModel.Child> commentsOnly = allDataList.get(1).data.children;
                     ReplyReccur(commentsOnly);
-                   // updateList();
+                    // updateList();
                     getSupportLoaderManager().initLoader(LOADER_ID, null, ReplyActivity.this);
 
                 }
@@ -213,7 +227,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
             // GetCommentsModel.Data_ data = comm.data;
             if (comm != null) {
                 GetCommentsModel.Reply reply = comm.data.mReplyData;
-                if(comm.data.subreddit!=null) {
+                if (comm.data.subreddit != null) {
                     dbHelper.insertComments(comm);
                     if (reply != null) {
                         child = reply.data.children;
