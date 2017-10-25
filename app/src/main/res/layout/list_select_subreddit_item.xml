@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:text="Subreddits"
+        android:text="@string/subreddits"
         android:textColor="@color/colorBasicText" />
 
     <android.support.v7.widget.SwitchCompat
@@ -21,5 +21,6 @@
         android:layout_gravity="center"
         android:text="@string/subscribe"
         android:textColor="@color/colorAccent"
+        android:contentDescription="@string/sub_unsub_subreddit"
         android:textSize="10sp" />
 </LinearLayout>

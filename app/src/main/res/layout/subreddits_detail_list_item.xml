@@ -80,6 +80,7 @@
             android:drawableEnd="@drawable/ic_comment"
             android:drawablePadding="8dp"
             android:text="@string/comment"
+            android:contentDescription="@string/comment"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_detail" />
@@ -103,7 +104,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/tv_vote_count"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_vote_count"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            />
 
         <ImageView
             android:id="@+id/image_down_vote"

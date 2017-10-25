@@ -114,10 +114,10 @@ public class SubredditDetailListAdapter extends RecyclerView.Adapter<RecyclerVie
                     Intent share = new Intent(android.content.Intent.ACTION_SEND);
                     share.setType("text/plain");
                     selectedData = resultDataList.get(position);
-                    share.putExtra(Intent.EXTRA_SUBJECT, "ReadyIt");
+                    share.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.app_name));
                     share.putExtra(Intent.EXTRA_TEXT, data.share_url);
 
-                    context.startActivity(Intent.createChooser(share, "Share text to."));
+                    context.startActivity(Intent.createChooser(share, context.getString(R.string.share_to)));
                 }
             });
             vHoler.comment_count.setOnClickListener(new View.OnClickListener() {
@@ -146,7 +146,7 @@ public class SubredditDetailListAdapter extends RecyclerView.Adapter<RecyclerVie
                         selectedData.likes = -1;
 
                     }
-                    calledApi = "voting";
+                    calledApi = context.getString(R.string.voting);
                     new RefreshToken().execute();
 
                 }
@@ -168,17 +168,17 @@ public class SubredditDetailListAdapter extends RecyclerView.Adapter<RecyclerVie
                         vHoler.updatevote(-1, selectedData);
                         selectedData.likes = -1;
                     }
-                    calledApi = "voting";
+                    calledApi = context.getString(R.string.voting);
                     new RefreshToken().execute();
                 }
             });
             vHoler.comment_count.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    calledApi = "comments";
+                    calledApi = context.getString(R.string.comments);
                     selectedData = resultDataList.get(position);
-                   context.startActivity(new Intent(context, ReplyActivity.class).putExtra("subreddit_name",selectedData.subreddit_name)
-                   .putExtra("id",selectedData.id));
+                   context.startActivity(new Intent(context, ReplyActivity.class).putExtra(Constants.SUB_NAME,selectedData.subreddit_name)
+                   .putExtra(Constants.SUB_ID,selectedData.id));
                 }
             });
         }

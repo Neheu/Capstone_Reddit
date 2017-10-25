@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.Manifest.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Optional permission for Google Analytics -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -11,9 +14,37 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:configChanges="orientation"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+
+        <receiver
+            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Enable Google Play Store Campaign reports -->
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="com.google.android.gms.analytics.CampaignTrackingService"
+            android:enabled="true"/>
+
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -44,6 +75,10 @@
             android:label="@string/title_activity_sub_reddits"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activity.ReadyItWidgetActivity"
+            android:label="@string/title_activity_sub_reddits"
+          />
+        <activity
             android:name=".activity.HomePageActivity"
             android:label="@string/title_activity_home_page"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -51,7 +86,7 @@
         <provider
             android:name=".db.ReadyitProvider"
             android:authorities="com.capstone.readyit.contentprovider"
-            android:exported="false" />
+            android:exported="true" />
 
         <activity
             android:name=".activity.SubredditDetailActivity"
@@ -69,6 +104,21 @@
             android:name=".activity.PostReplyActivity"
             android:label="@string/title_activity_post_reply"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <receiver
+            android:name=".redditwidget.RedditWidgetProvider"
+
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE">
+
+                </action>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/reddit_widget_info" />
+        </receiver>
+        <service android:name=".redditwidget.RedditWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

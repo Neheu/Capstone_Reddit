@@ -36,5 +36,28 @@
     <string name="post_now">Post</string>
     <string name="posted_successfully">Replyposted successfully</string>
     <string name="error_occurred">An error occurred</string>
+    <string name="sub_unsub_subreddit">To subscribe or unsubscribe a subreddit</string>
+    <string name="unsubscribe_subreddits">UnSubscribe Subreddits!</string>
+    <string name="subscribe_subreddits">Subscribe Subreddits!</string>
+    <!-- AdMob ad unit IDs -->
+    <string name="banner_home_footer">ca-app-pub-3769391028839978/6044959098</string>
+    <string name="interstitial_full_screen">ca-app-pub-3769391028839978/1203695957</string>
+    <string name="error">error</string>
+    <string name="state">state</string>
+    <string name="code">code</string>
+    <string name="user_agent_string">Sample App</string>
+    <string name="basic">Basic</string>
+    <string name="access_token">access_token</string>
+    <string name="refresh_token">refresh_token</string>
+    <string name="after">after</string>
+    <string name="limit">limit</string>
+    <string name="count">count</string>
+    <string name="before">before</string>
+    <string name="bearer">bearer</string>
+    <string name="unsub">unsub</string>
+    <string name="data">data</string>
+    <string name="share_to">Share to</string>
+    <string name="voting">voting</string>
+    <string name="comments">comments</string>
 
 </resources>

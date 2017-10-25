@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'androidkey'
+            keyPassword 'keyPassword'
+            storeFile file("$rootDir/keystore.jks")
+            storePassword 'storePassword'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -12,12 +20,19 @@ android {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         useLibrary 'org.apache.http.legacy'
+        multiDexEnabled true
 
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.config
+            renderscriptDebuggable false
+            renderscriptOptimLevel 3
+            zipAlignEnabled true
         }
     }
     packagingOptions {
@@ -41,14 +56,15 @@ dependencies {
     compile 'com.android.support:design:25.3.0'
     compile 'net.dean.jraw:JRAW:0.9.0'
     compile 'com.jakewharton:butterknife:8.8.0'
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:support-v4:25.3.0'
-    compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.0'
     compile project(':multilevelexpindlistview')
-
+    compile 'com.google.android.gms:play-services-ads:10.2.4'
+    compile 'com.google.android.gms:play-services-analytics:10.2.4'
 }

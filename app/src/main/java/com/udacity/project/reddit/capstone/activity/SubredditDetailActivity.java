@@ -27,10 +27,8 @@ public class SubredditDetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)
     @Nullable
     Toolbar mToolbar;
-    private Context context;
     private SubredditDetailFragment fragment;
-    private static String FRAGMENT_DETAILS_TAG = "fragment_detail";
-    private SubredditListViewModel data;
+    private static final String FRAGMENT_DETAILS_TAG = "fragment_detail";
     @BindView(R.id.reply_fab)
     FloatingActionButton fabReply;
 
@@ -41,7 +39,6 @@ public class SubredditDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_subreddit_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        context = this;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -53,7 +50,6 @@ public class SubredditDetailActivity extends AppCompatActivity {
         }
 
         if (savedInstanceState == null) {
-            data = getIntent().getExtras().getParcelable(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
 
             Bundle arguments = new Bundle();
             arguments.putParcelable(Constants.INTENT_SUBREDDIT_DETAIL_DATA,
@@ -63,7 +59,6 @@ public class SubredditDetailActivity extends AppCompatActivity {
 
             getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container, fragment, FRAGMENT_DETAILS_TAG).commit();
         } else {
-            data = getIntent().getExtras().getParcelable(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
             //  isMarkedFav = savedInstanceState.getBoolean(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
         }
 

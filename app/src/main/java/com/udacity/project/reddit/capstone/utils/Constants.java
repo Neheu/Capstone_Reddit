@@ -41,8 +41,14 @@ public class Constants {
     public static final String AUTH_URL = "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
             "&response_type=code&state=%s&redirect_uri=%s&" +
             "duration=permanent&scope=edit, flair, history, modconfig, modflair, modlog, modposts, modwiki, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote, wikiedit, wikiread";
-    public static final String REDIRECT_URI =  "http://www.example.com/redirect";
+    public static final String REDIRECT_URI = "http://www.example.com/redirect";
     public static final String STATE = "RANDON_STATE_STRING";
+    public static final String INTENT_HOME_DATA = "intent_home_data";
+    public static final String INTENT_MINE_SUBREDDITS = "intent_mine_subreddits";
+    public static final String INTENT_POST_REPLY = "intent_post_reply";
+    public static final String INTENT_REPLY = "intent_reply";
+    public static final String SUB_NAME = "subreddit_name";
+    public static final String SUB_ID = "id";
     public static String SCOPE = "identity edit flair";
 
     public static final String ACCESS_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
@@ -51,7 +57,8 @@ public class Constants {
     public static final String INTENT_SUBREDDIT_DETAIL_DATA = "sub_detail_data";
     public static final String PRERENCES_TOKEN_REFRESH_TIME = "refresh_token_time";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String USER_AGENT_STRING ="User-Agent";
+    public static final String USER_AGENT_STRING = "User-Agent";
+    public static final String MINE_SUBS_URL="/subreddits/mine/subscriber.json";
     // Prefrences.........
     public static String PREFRENCE_NAME = "reddit_pref";
     public static String PREFRENCE_MODHASH = "Modhash";
@@ -97,7 +104,7 @@ public class Constants {
                     long millis = date.getTime();
                     edit.putLong(PRERENCES_TOKEN_REFRESH_TIME, millis);
                     edit.apply();
-                    tokenInf.onTokenRefreshed(getToken(con),apiTag);
+                    tokenInf.onTokenRefreshed(getToken(con), apiTag);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

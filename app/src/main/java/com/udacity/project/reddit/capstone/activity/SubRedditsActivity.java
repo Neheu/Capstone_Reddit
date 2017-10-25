@@ -9,9 +9,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,14 +56,13 @@ import retrofit2.Response;
 import static com.udacity.project.reddit.capstone.utils.DatabaseUtils.TABLE_SUBS_SUBREDDIT;
 
 public class SubRedditsActivity extends AppCompatActivity implements SubredditsAdapters.checkChangeListener, SubredditsAdapters.onSubredditSelectListener, SwipeRefreshLayout.OnRefreshListener,
-        GetRefreshedToken {
+        GetRefreshedToken, LoaderManager.LoaderCallbacks<Cursor> {
     private ApiInterface apiInterface;
     private RecyclerView recycleViewSubreddit;
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    Toolbar toolBar;
     View parentLayout;
-    private Cursor cursor;
     private RedyItSQLiteOpenHelper dbHelper;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -71,11 +71,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     private String before = "", after = "";
     private ArrayList<SubscribeRedditsViewModel> favList = new ArrayList<>();
     private SubredditsAdapters adapters;
-    private NetworkUtils networkUtils;
-    private List<String> sub = new ArrayList<>(), unsub = new ArrayList<>();
     private Snackbar snackbar;
     @BindView(R.id.no_subs_subreddit_layout)
-    LinearLayout no_subscribe_layout;
+    LinearLayout noSubscribeLayout;
+    private int LOADER_ID = 211;
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
@@ -84,19 +83,18 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         setContentView(R.layout.activity_sub_reddits);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolBar);
         preferences = getSharedPreferences(Constants.PREFRENCE_NAME, MODE_PRIVATE);
         editor = preferences.edit();
-        networkUtils = new NetworkUtils();
         parentLayout = findViewById(R.id.parent_layout);
         snackbar = Snackbar
-                .make(parentLayout, "Subscribe Subreddits!", Snackbar.LENGTH_INDEFINITE);
+                .make(parentLayout, R.string.subscribe_subreddits, Snackbar.LENGTH_INDEFINITE);
         recycleViewSubreddit = (RecyclerView) findViewById(R.id.rv_subreddit);
         LinearLayoutManager gridLayoutManager = new LinearLayoutManager(this);
         recycleViewSubreddit.setLayoutManager(gridLayoutManager);
         dbHelper = new RedyItSQLiteOpenHelper(this);
         swipeRefreshLayout.setOnRefreshListener(this);
-        no_subscribe_layout.setVisibility(View.GONE);
+        noSubscribeLayout.setVisibility(View.GONE);
         //Connect to ReteoFit and get subreddits
         /**
          * Showing Swipe Refresh animation on activity create
@@ -110,10 +108,11 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                                     @Override
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
-                                        if (networkUtils.isOnline(SubRedditsActivity.this))
+                                        if (!NetworkUtils.isOnline(SubRedditsActivity.this))
                                             new GetSubredditsList().execute();
                                         else
-                                            updateList();
+                                            getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
+
                                     }
                                 }
         );
@@ -124,10 +123,11 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         adapters.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                if (networkUtils.isOnline(SubRedditsActivity.this))
+                if (NetworkUtils.isOnline(SubRedditsActivity.this))
                     connectApiClient("/subreddits/popular.json?limit=10&after=" + after);
                 else
-                    updateList();
+                    getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
+
             }
         });
     }
@@ -135,7 +135,8 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     @Override
     protected void onResume() {
         super.onResume();
-        updateList();
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, SubRedditsActivity.this);
+
     }
 
     private String token = "";
@@ -144,6 +145,26 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     public void onTokenRefreshed(String token, String tag) {
         this.token = token;
         connectApiClient("/subreddits/popular.json");
+
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
+
+        // stopping swipe refresh
+        swipeRefreshLayout.setRefreshing(false);
+        return new CursorLoader(this, ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        populateSubscribedRedditList(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null));
 
     }
 
@@ -187,11 +208,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                     editor.putString(Constants.PREFRENCE_BEFORE, before);
                     editor.apply();
 
-                    updateList();
+                    getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
+
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
-                } else if (favList.size() == 0) {
-                    updateList();
                 }
             }
 
@@ -204,10 +224,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
     private void populateSubscribedRedditList(Cursor subredditCursor) {
         favList.clear();
-        if (cursor != null && cursor.moveToFirst())
+        if (subredditCursor != null && subredditCursor.moveToFirst())
             do {
                 SubscribeRedditsViewModel holder = new SubscribeRedditsViewModel();
-                holder.id = cursor.getString(cursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
+                holder.id = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry._ID));
                 holder.isSubscribed = Boolean.valueOf(subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER)));
                 holder.display_name = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.DISPLAY_NAME));
                 holder.url = subredditCursor.getString(subredditCursor.getColumnIndexOrThrow(ReadyItContract.ReadyitEntry.URL));
@@ -220,7 +240,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
             }
 
 
-            while (cursor.moveToNext());
+            while (subredditCursor.moveToNext());
         recycleViewSubreddit.setAdapter(adapters);
         adapters.notifyDataSetChanged();
 
@@ -249,21 +269,20 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        if (networkUtils.isOnline(SubRedditsActivity.this))
-            updateList();
+        if (NetworkUtils.isOnline(SubRedditsActivity.this))
+            connectApiClient("/subreddits/popular.json?limit=10&after=" + after);
         else
-            connectApiClient("/subreddits/popular.json?limit=10&before=" + before + "&after=" + after);
-
+            getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
 
     }
 
-    private void updateList() {
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
-        cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
-        populateSubscribedRedditList(cursor);
-        // stopping swipe refresh
-        swipeRefreshLayout.setRefreshing(false);
-    }
+//    private void updateList() {
+//        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
+//        cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
+//        populateSubscribedRedditList(cursor);
+//        // stopping swipe refresh
+//        swipeRefreshLayout.setRefreshing(false);
+//    }
 
 
     @Override
@@ -272,8 +291,12 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
         switch (item.getItemId()) {
             case R.id.my_subreddits:
                 startActivity(new Intent(SubRedditsActivity.this, MineSubredditsActivity.class));
-                return true;
+                break;
+            case android.R.id.home:
+                getSupportLoaderManager().destroyLoader(LOADER_ID);
+                finish();
 
+                break;
 
         }
         return true;
@@ -286,7 +309,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
     }
 
     public void showSnackbar(final HashMap<String, SubscribeRedditsViewModel> data) {
-        snackbar.setAction("Done", new View.OnClickListener() {
+        snackbar.setAction(R.string.done, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 for (String key : data.keySet()) {
@@ -315,7 +338,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                         if (response.code() == 200) {
                             ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                             dbHelper.updateSubscribeReddits(id, "1");
-                            updateList();
+                            getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
                         }
                     }
 
@@ -325,5 +348,10 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                     }
                 });
     }
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
+        finish();
+    }
 }

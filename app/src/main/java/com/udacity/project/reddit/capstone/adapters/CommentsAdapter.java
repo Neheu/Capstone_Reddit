@@ -89,8 +89,8 @@ public class CommentsAdapter extends MultiLevelExpIndListAdapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v;
-        RecyclerView.ViewHolder viewHolder;
+        View v = null;
+        RecyclerView.ViewHolder viewHolder = null;
         switch (viewType) {
             case VIEW_TYPE_ITEM:
                 int resource = R.layout.recyclerview_item;
@@ -104,8 +104,7 @@ public class CommentsAdapter extends MultiLevelExpIndListAdapter {
                         .inflate(resource, parent, false);
                 viewHolder = new ContentViewHolder(v);
                 break;
-            default:
-                throw new IllegalStateException("unknown viewType");
+
         }
 
         v.setOnClickListener(mListener);
@@ -147,7 +146,7 @@ public class CommentsAdapter extends MultiLevelExpIndListAdapter {
                 contentVH.contentTextView.setText(content.content);
                 break;
             default:
-                throw new IllegalStateException("unknown viewType");
+                break;
         }
     }
 

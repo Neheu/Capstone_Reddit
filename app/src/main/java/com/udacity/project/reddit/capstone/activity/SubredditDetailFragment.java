@@ -46,9 +46,6 @@ public class SubredditDetailFragment extends Fragment {
     @BindView(R.id.rv_replylist)
     RecyclerView rvList;
     private SubredditListViewModel data;
-    private RedyItSQLiteOpenHelper dbHelper;
-    private SharedPreferences preferences;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,9 +98,6 @@ public class SubredditDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.subreddit_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
-        dbHelper = new RedyItSQLiteOpenHelper(getActivity());
-        preferences = getActivity().getSharedPreferences(Constants.PREFRENCE_NAME, Context.MODE_PRIVATE);
-
         return rootView;
     }
 

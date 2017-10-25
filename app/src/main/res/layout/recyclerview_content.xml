@@ -3,13 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/black_overlay">
+   >
 
     <TextView
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:id="@+id/content_textview"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:padding="16dp"/>
+        android:padding="16dp"
+        android:textColor="@color/colorAccent"/>
 
     <View
         android:layout_width="match_parent"

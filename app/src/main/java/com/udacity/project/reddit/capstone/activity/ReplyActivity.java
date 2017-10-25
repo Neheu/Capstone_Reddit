@@ -2,23 +2,25 @@ package com.udacity.project.reddit.capstone.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.adapters.CommentsAdapter;
-import com.udacity.project.reddit.capstone.adapters.ReplyExpandableAdapter;
-import com.udacity.project.reddit.capstone.adapters.SubredditDetailListAdapter;
 import com.udacity.project.reddit.capstone.db.ReadyItContract;
 import com.udacity.project.reddit.capstone.db.ReadyitProvider;
 import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
@@ -26,7 +28,6 @@ import com.udacity.project.reddit.capstone.model.CommentChildModel;
 import com.udacity.project.reddit.capstone.model.CommentsParentModel;
 import com.udacity.project.reddit.capstone.model.GetCommentsModel;
 import com.udacity.project.reddit.capstone.model.ReplyViewModel;
-import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
 import com.udacity.project.reddit.capstone.server.GetRefreshedToken;
 import com.udacity.project.reddit.capstone.utils.Constants;
@@ -44,10 +45,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReplyActivity extends AppCompatActivity implements GetRefreshedToken {
+public class ReplyActivity extends AppCompatActivity implements GetRefreshedToken , LoaderManager.LoaderCallbacks<Cursor>{
     private ApiInterface apiInterface;
     private Intent intent;
-    private String subreddit_name, subreddit_id;
+    private String subredditName, subredditId;
     private RedyItSQLiteOpenHelper dbHelper;
     private ArrayList<ReplyViewModel> repTitle = new ArrayList<>();
     private ArrayList<ReplyViewModel> repDataParent = new ArrayList<>();
@@ -63,7 +64,12 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     @BindView(R.id.rv_comment)
     RecyclerView rvComments;
     private CommentsAdapter commentsAdapter;
+    @BindView(R.id.tv_post)
+    TextView txtPost;
+    @BindView(R.id.tv_subreddit_url)
+    TextView subredditTitle;
     private LinearLayoutManager mLayoutManager;
+    private int LOADER_ID=111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +85,9 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         rvComments.setLayoutManager(mLayoutManager);
         dbHelper = new RedyItSQLiteOpenHelper(this);
         intent = getIntent();
-        subreddit_id = intent.getStringExtra("id");
-        subreddit_name = intent.getStringExtra("subreddit_name");
+        subredditId = intent.getStringExtra(Constants.SUB_ID);
+        subredditName = intent.getStringExtra(Constants.SUB_NAME);
+        subredditTitle.setText(subredditName);
         commentsAdapter = new CommentsAdapter(this, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +99,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ReplyActivity.this, PostReplyActivity.class).putExtra("name", fullParentName));
+                startActivity(new Intent(ReplyActivity.this, PostReplyActivity.class).putExtra(Constants.SUB_NAME, fullParentName));
             }
         });
 
@@ -102,6 +109,33 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     @Override
     public void onTokenRefreshed(String token, String tag) {
         getComments(token);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getSupportLoaderManager().destroyLoader(LOADER_ID);
+                finish();
+
+                break;
+        }
+        return true;
+    }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri uri = ReadyItContract.ReadyitEntry.CONTENT_URI;
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS_TITLE);
+        return new CursorLoader(this, uri, null,ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        populateReplyTitle(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     private class RefreshToken extends AsyncTask<Void, Void, Void> {
@@ -138,7 +172,7 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     private HashMap<String, List<GetCommentsModel.Child>> getComments(String token) {
         final HashMap<String, List<GetCommentsModel.Child>> commentsList = new HashMap<>();
         apiInterface = getClient().create(ApiInterface.class);
-        Call call = apiInterface.doGetComments("bearer " + token, subreddit_name, subreddit_id);
+        Call call = apiInterface.doGetComments("bearer " + token, subredditName, subredditId);
 
         call.enqueue(new Callback() {
             @Override
@@ -150,13 +184,14 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
                 if (response.code() == 200) {
                     List<GetCommentsModel> allDataList = (List<GetCommentsModel>) response.body();
                     List<GetCommentsModel.Child> commentsTitle = allDataList.get(0).data.children;
+                    txtPost.setText(commentsTitle.get(0).data.selftext);
                     for (GetCommentsModel.Child child : commentsTitle) {
                         dbHelper.insertCommentsTitle(child);
                     }
                     List<GetCommentsModel.Child> commentsOnly = allDataList.get(1).data.children;
                     ReplyReccur(commentsOnly);
-                    updateList();
-
+                   // updateList();
+                    getSupportLoaderManager().initLoader(LOADER_ID, null, ReplyActivity.this);
 
                 }
             }
@@ -178,25 +213,26 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
             // GetCommentsModel.Data_ data = comm.data;
             if (comm != null) {
                 GetCommentsModel.Reply reply = comm.data.mReplyData;
-
-                dbHelper.insertComments(comm);
-                if (reply != null) {
-                    child = reply.data.children;
-                    ReplyReccur(child);
+                if(comm.data.subreddit!=null) {
+                    dbHelper.insertComments(comm);
+                    if (reply != null) {
+                        child = reply.data.children;
+                        ReplyReccur(child);
+                    }
                 }
             }
         }
     }
 
 
-    private void updateList() {
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS_TITLE);
-        Cursor cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry._ID + " ='" + subreddit_id + "'", null, null);
-        populateReplyTitle(cursor);
-
-        // stopping swipe refresh
-//        swipeRefreshLayout.setRefreshing(false);
-    }
+//    private void updateList() {
+//        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS_TITLE);
+//        Cursor cursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
+//        populateReplyTitle(cursor);
+//
+//        // stopping swipe refresh
+////        swipeRefreshLayout.setRefreshing(false);
+//    }
 
     private void populateReplyTitle(Cursor subredditCursor) {
         if (subredditCursor != null && subredditCursor.moveToFirst())
@@ -312,4 +348,11 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
 
 //    }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
+        finish();
+    }
 }

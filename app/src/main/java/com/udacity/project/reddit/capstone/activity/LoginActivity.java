@@ -86,28 +86,29 @@ public class LoginActivity extends AppCompatActivity {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new myWebClient());
+
     }
 
     public class myWebClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            // TODO Auto-generated method stub
             super.onPageStarted(view, url, favicon);
+
 
         }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // TODO Auto-generated method stub
-            if (url.startsWith("http://www.example.com")) {
+             if (url.startsWith("http://www.example.com")) {
                 //Means everything is good
                 Uri uri = Uri.parse(url);
-                if (uri.getQueryParameter("error") != null) {
-                    String error = uri.getQueryParameter("error");
+                 String errorString = getString(R.string.error);
+                if (uri.getQueryParameter(errorString) != null) {
+                    String error = uri.getQueryParameter(errorString);
                 } else {
-                    String state = uri.getQueryParameter("state");
+                    String state = uri.getQueryParameter(getString(R.string.state));
                     if (state.equals(Constants.STATE)) {
-                        String code = uri.getQueryParameter("code");
+                        String code = uri.getQueryParameter(getString(R.string.code));
                         getAccessToken(code);
 
                         webView = null;
@@ -148,8 +149,8 @@ public class LoginActivity extends AppCompatActivity {
         String encodedAuthString = Base64.encodeToString(authString.getBytes(),
                 Base64.NO_WRAP);
         Request request = new Request.Builder()
-                .addHeader(Constants.USER_AGENT_STRING, "Sample App")
-                .addHeader(Constants.AUTHORIZATION, "Basic " + encodedAuthString)
+                .addHeader(Constants.USER_AGENT_STRING, getString(R.string.user_agent_string))
+                .addHeader(Constants.AUTHORIZATION, getString(R.string.basic) + encodedAuthString)
                 .url(ACCESS_TOKEN_URL)
                 .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"),
                         "grant_type=authorization_code&code=" + code +
@@ -159,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(">> ", "ERROR: " + e);
+
             }
 
             @Override
@@ -169,8 +170,8 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject data = null;
                 try {
                     data = new JSONObject(json);
-                    String accessToken = data.optString("access_token");
-                    String refreshToken = data.optString("refresh_token");
+                    String accessToken = data.optString(getString(R.string.access_token));
+                    String refreshToken = data.optString(getString(R.string.refresh_token));
                     editor.putString(Constants.PREFRENCE_TOKEN, accessToken);
                     editor.putString(Constants.PREFRENCE_REFRESH_TOKEN, refreshToken);
                     Date date = new Date(System.currentTimeMillis());
@@ -180,7 +181,6 @@ public class LoginActivity extends AppCompatActivity {
                     editor.apply();
                     finish();
                     startActivity(new Intent(LoginActivity.this, MineSubredditsActivity.class));
-
 
 
                 } catch (JSONException e) {

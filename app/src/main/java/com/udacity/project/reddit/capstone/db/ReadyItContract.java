@@ -18,7 +18,7 @@ public class ReadyItContract {
 
     // Define the possible paths for accessing data in this contract
     // This is the path for the "readyit" directory
-    public static final String PATH_READYIT = "movies";
+    public static final String PATH_READYIT = "reddit";
 
     public static final class ReadyitEntry implements BaseColumns {
         // PopularMoviesEntry content URI = base content URI + path

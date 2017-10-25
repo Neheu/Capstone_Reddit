@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:textSize="14sp"
-        tools:text="124546 subscribers " />
+       />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/tv_detail_name"
@@ -38,14 +38,14 @@
         android:paddingEnd="8dp"
         android:paddingStart="8dp"
         android:textSize="14sp"
-        tools:text="Enjoy this " />
+       />
 
-        <Button
-            android:id="@+id/btn_sub"
-            android:layout_gravity="center"
-            android:text="@string/subscribe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/tv_detail_name"/>
+        <!--<Button-->
+            <!--android:id="@+id/btn_sub"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:text="@string/subscribe"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_below="@+id/tv_detail_name"/>-->
 </RelativeLayout>

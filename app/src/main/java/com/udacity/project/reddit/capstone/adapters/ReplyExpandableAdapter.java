@@ -19,42 +19,42 @@ import java.util.List;
  */
 
 public class ReplyExpandableAdapter extends BaseExpandableListAdapter {
-    private Context _context;
-    private List<String> _listDataHeader; // header titles
+    private Context context;
+    private List<String> listDataHeader; // header titles
     // child data in format of header title, child title
-    private HashMap<String, List<ReplyViewModel>> _listDataChild;
+    private HashMap<String, List<ReplyViewModel>> listDataChild;
 
     public ReplyExpandableAdapter(Context context, List<String> listDataHeader,
                                   HashMap<String, List<ReplyViewModel>> listChildData) {
-        this._context = context;
-        this._listDataHeader = listDataHeader;
-        this._listDataChild = listChildData;
+        this.context = context;
+        this.listDataHeader = listDataHeader;
+        this.listDataChild = listChildData;
     }
 
     @Override
     public int getGroupCount() {
-        return this._listDataHeader.size();
+        return this.listDataHeader.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        if (_listDataChild == null && _listDataChild.size() == 0)
+        if (listDataChild == null && listDataChild.size() == 0)
             return 0;
         else
-            return this._listDataChild.get(
-                    this._listDataHeader.get(groupPosition))
+            return this.listDataChild.get(
+                    this.listDataHeader.get(groupPosition))
                     .size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this._listDataHeader.get(groupPosition);
+        return this.listDataHeader.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+        return this.listDataChild.get(this.listDataHeader.get(groupPosition))
                 .get(childPosition);
     }
 
@@ -77,7 +77,7 @@ public class ReplyExpandableAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this._context
+            LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.reply_list_item, null);
         }
@@ -95,7 +95,7 @@ public class ReplyExpandableAdapter extends BaseExpandableListAdapter {
         final ReplyViewModel childText = (ReplyViewModel) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this._context
+            LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.reply_child_item, null);
         }

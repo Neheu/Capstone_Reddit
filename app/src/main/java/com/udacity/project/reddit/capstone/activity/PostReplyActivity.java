@@ -42,31 +42,33 @@ public class PostReplyActivity extends AppCompatActivity implements GetRefreshed
     EditText postComment;
     Intent intent;
     private String name;
+    private String replyToPost;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_reply);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         intent = getIntent();
-        name = intent.getStringExtra("name");
+        name = intent.getStringExtra(Constants.SUB_NAME);
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new RefreshToken().execute();
+                if (savedInstanceState != null) {
+                    replyToPost = savedInstanceState.getString(Constants.INTENT_POST_REPLY);
+                } else
+                    new RefreshToken().execute();
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Constants.INTENT_POST_REPLY, replyToPost);
     }
 
     @Override
@@ -90,16 +92,15 @@ public class PostReplyActivity extends AppCompatActivity implements GetRefreshed
     }
 
     private void postComment(String token) {
-        String replyText = postComment.getText().toString();
-        if (replyText.equals("")) {
+
+        if (replyToPost.equals("")) {
             Toast.makeText(this, R.string.write_comment, Toast.LENGTH_SHORT).show();
         } else {
             ApiInterface mApiInterface = ApiClient.getClient().create(ApiInterface.class);
-            mApiInterface.doPostReply("bearer " + token, "json", replyText, name)
+            mApiInterface.doPostReply("bearer " + token, "json", replyToPost, name)
                     .enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            Log.d(">>", "Success responseCode:" + response.code());
                             if (response.code() == 200) {
                                 postComment.setText("");
                                 // ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
@@ -114,7 +115,6 @@ public class PostReplyActivity extends AppCompatActivity implements GetRefreshed
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Log.d("<<", "fail:" + t.getMessage());
                         }
                     });
         }
