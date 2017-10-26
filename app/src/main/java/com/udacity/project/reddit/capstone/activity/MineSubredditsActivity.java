@@ -216,7 +216,7 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
         map.put(getString(R.string.before), before);
 
         apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call call = apiInterface.doGetMineSubreddits(getString(R.string.bearer) + token, url, map);
+        Call call = apiInterface.doGetMineSubreddits(getString(R.string.bearer)+" " + token, url, map);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -371,7 +371,7 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
 
     private void updateSubscription(final String subVal, Context context, String subredditFullName, final String id) {
         ApiInterface mApiInterface = ApiClient.getClient().create(ApiInterface.class);
-        String token = getString(R.string.bearer) + Constants.getToken(context);
+        String token = getString(R.string.bearer)+" " + Constants.getToken(context);
         mApiInterface.doSubUnsubSubreddit(token, subVal, false, subredditFullName)
                 .enqueue(new Callback<ResponseBody>() {
                     @Override

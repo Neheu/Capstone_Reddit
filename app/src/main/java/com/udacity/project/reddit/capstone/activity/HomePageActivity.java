@@ -188,7 +188,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
 
     private void connectApiClient(String token) {
         apiInterface = getClient().create(ApiInterface.class);
-        Call call = apiInterface.doGetSubredditList(getString(R.string.bearer) + token, subredditUrl + ".json");
+        Call call = apiInterface.doGetSubredditList(getString(R.string.bearer)+" " + token, subredditUrl + ".json");
 
         call.enqueue(new Callback() {
             @Override

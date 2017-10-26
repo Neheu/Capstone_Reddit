@@ -150,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                 Base64.NO_WRAP);
         Request request = new Request.Builder()
                 .addHeader(Constants.USER_AGENT_STRING, getString(R.string.user_agent_string))
-                .addHeader(Constants.AUTHORIZATION, getString(R.string.basic) + encodedAuthString)
+                .addHeader(Constants.AUTHORIZATION, getString(R.string.basic)+" " + encodedAuthString)
                 .url(ACCESS_TOKEN_URL)
                 .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"),
                         "grant_type=authorization_code&code=" + code +

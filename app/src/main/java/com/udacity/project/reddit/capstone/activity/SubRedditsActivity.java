@@ -108,7 +108,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                                     @Override
                                     public void run() {
                                         swipeRefreshLayout.setRefreshing(true);
-                                        if (!NetworkUtils.isOnline(SubRedditsActivity.this))
+                                        if (NetworkUtils.isOnline(SubRedditsActivity.this))
                                             new GetSubredditsList().execute();
                                         else
                                             getSupportLoaderManager().initLoader(LOADER_ID, null, SubRedditsActivity.this);
