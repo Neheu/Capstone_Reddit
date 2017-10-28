@@ -18,12 +18,11 @@ public class ReadyItContract {
 
     // Define the possible paths for accessing data in this contract
     // This is the path for the "readyit" directory
-    public static final String PATH_READYIT = "reddit";
-
+    public static final String PAT_MINE_READYIT = "reddit";
     public static final class ReadyitEntry implements BaseColumns {
         // PopularMoviesEntry content URI = base content URI + path
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_READYIT).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PAT_MINE_READYIT).build();
 
         //Subs Subreddit table columns --
         public static final String _ID = "id";
@@ -31,7 +30,7 @@ public class ReadyItContract {
         public static final String TITLE = "title";
         public static final String NAME = "name";
         public static final String URL = "url";
-//        public static final String IS_SUBSCRIBED = "is_subscribed";
+        //        public static final String IS_SUBSCRIBED = "is_subscribed";
         public static final String CREATED_UTC = "created_utc";
         public static final String SUBS_COUNT = "subs_count";
         public static final String SUBREDDIT_ID = "subreddit_id";

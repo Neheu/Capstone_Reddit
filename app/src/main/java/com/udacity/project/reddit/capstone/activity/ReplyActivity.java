@@ -138,8 +138,9 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = ReadyItContract.ReadyitEntry.CONTENT_URI;
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS_TITLE);
-        return new CursorLoader(this, uri, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
+        String table[] = new String[1];
+        table[0]= DatabaseUtils.TABLE_COMMENTS_TITLE;
+        return new CursorLoader(this, uri, table, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null);
     }
 
     @Override
@@ -283,9 +284,11 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
         listParentHeader.clear();
         Cursor subredditCursor = null;
         for (ReplyViewModel rep : repTitle) {
-            ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS);
+            String table[] = new String[1];
+            table[0] = DatabaseUtils.TABLE_COMMENTS;
+
             fullParentName = rep.kind + "_" + rep.id;
-            subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + fullParentName + "'", null, null);
+            subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, table, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + fullParentName + "'", null, null);
 
             if (subredditCursor != null && subredditCursor.moveToFirst())
                 do {
@@ -330,9 +333,10 @@ public class ReplyActivity extends AppCompatActivity implements GetRefreshedToke
     private void populateReplyListChild(ReplyViewModel rep, int position) {
         Cursor subredditCursor = null;
 //        for (ReplyViewModel rep : repDataParent) {
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_COMMENTS);
         String parent_id = rep.kind + "_" + rep.id;
-        subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + parent_id + "'", null, null);
+        String table[] = new String[1];
+        table[0] = DatabaseUtils.TABLE_COMMENTS;
+        subredditCursor = getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, table, ReadyItContract.ReadyitEntry.PARENT_ID + " ='" + parent_id + "'", null, null);
 
         if (subredditCursor != null && subredditCursor.moveToFirst())
             do {

@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'androidkey'
-            keyPassword 'keyPassword'
-            storeFile file("$rootDir/keystore.jks")
-            storePassword 'storePassword'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file("D:/Nanodegree/Projects Github/Capstone_Reddit/android.keystore.release.jks")
+//            storePassword "password"
+//            keyAlias "androidKey"
+//            keyPassword "password"
+//        }
+
+//    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -21,7 +22,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         useLibrary 'org.apache.http.legacy'
         multiDexEnabled true
-
     }
     buildTypes {
         release {
@@ -29,10 +29,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             debuggable false
             jniDebuggable false
-            signingConfig signingConfigs.config
             renderscriptDebuggable false
             renderscriptOptimLevel 3
             zipAlignEnabled true
+//            signingConfig signingConfigs.release
         }
     }
     packagingOptions {
@@ -40,6 +40,8 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
 
+    }
+    productFlavors {
     }
 }
 

@@ -150,11 +150,11 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
-
+        String []table = new String[1];
+        table[0] =DatabaseUtils.TABLE_SUBS_SUBREDDIT;
         // stopping swipe refresh
         swipeRefreshLayout.setRefreshing(false);
-        return new CursorLoader(this, ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
+        return new CursorLoader(this, ReadyItContract.ReadyitEntry.CONTENT_URI, table, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null));
+       // loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='0'", null, null));
 
     }
 
@@ -197,7 +197,7 @@ public class SubRedditsActivity extends AppCompatActivity implements SubredditsA
                 List<GetSubredditsModel.Child> list = model.data.children;
                 if (list != null && list.size() > 0) {
                     for (GetSubredditsModel.Child data : list) {
-                        if (!dbHelper.isAlreadyInserted(data.data.id)) {
+                        if (!dbHelper.isAlreadyInserted(data.data.id,TABLE_SUBS_SUBREDDIT)) {
                             ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                             dbHelper.insertSubSubreddits(data);
                         }

@@ -16,9 +16,11 @@ import android.widget.ImageView;
 
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.adapters.SubredditDetailListAdapter;
+import com.udacity.project.reddit.capstone.db.ReadyitProvider;
 import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
 import com.udacity.project.reddit.capstone.model.SubscribeRedditsViewModel;
 import com.udacity.project.reddit.capstone.utils.Constants;
+import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 
 import butterknife.BindView;
 
@@ -62,6 +64,12 @@ public class SubredditDetailActivity extends AppCompatActivity {
             //  isMarkedFav = savedInstanceState.getBoolean(Constants.INTENT_SUBREDDIT_DETAIL_DATA);
         }
 
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
+        finish();
     }
 
 }

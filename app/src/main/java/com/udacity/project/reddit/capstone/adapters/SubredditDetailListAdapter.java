@@ -123,7 +123,7 @@ public class SubredditDetailListAdapter extends RecyclerView.Adapter<RecyclerVie
             vHoler.comment_count.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(new Intent(context, SubredditDetailActivity.class).putExtra(Constants.INTENT_SUBREDDIT_DETAIL_DATA, selectedData));
+                    context.startActivity(new Intent(context, ReplyActivity.class).putExtra(Constants.SUB_ID, selectedData.id).putExtra(Constants.SUB_NAME,selectedData.subreddit_name));
                 }
             });
             vHoler.img_vote_up.setOnClickListener(new View.OnClickListener() {

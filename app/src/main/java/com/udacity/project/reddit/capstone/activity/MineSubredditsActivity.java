@@ -176,15 +176,15 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = ReadyItContract.ReadyitEntry.CONTENT_URI;
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
-
-        return new CursorLoader(this, uri, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='1'", null, null);
+     //   ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
+        String []table = new String[1];
+        table[0] =DatabaseUtils.TABLE_SUBS_SUBREDDIT;
+        return new CursorLoader(this, uri, table, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='1'", null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         swipeRefreshLayout.setRefreshing(false);
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
         if (loader.getId() == LOADER_ID)
             populateSubscribedRedditList(data);
         else
@@ -233,8 +233,8 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
 
                 if (list != null && list.size() > 0) {
                     for (GetSubredditsModel.Child data : list) {
-                        ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
-                        if (!dbHelper.isAlreadyInserted(data.data.id)) {
+                       // ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
+                        if (!dbHelper.isAlreadyInserted(data.data.id,TABLE_SUBS_SUBREDDIT)) {
                             dbHelper.insertSubSubreddits(data);
                         }
                     }
@@ -289,8 +289,8 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, MineSubredditsActivity.this);
-
+      //  getSupportLoaderManager().restartLoader(LOADER_ID, null, MineSubredditsActivity.this);
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_SUBS_SUBREDDIT);
 //        if (dbHelper.isTableNotEmpty(DatabaseUtils.TABLE_SUBS_SUBREDDIT, dbHelper.getWritableDatabase()) && NetworkUtils.isOnline(MineSubredditsActivity.this)) {
 //            swipeRefreshLayout.setRefreshing(true);
 //            new GetSubredditsList().execute();
@@ -377,7 +377,7 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.code() == 200) {
-                            ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
+                          //  ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                             dbHelper.updateSubscribeReddits(id, "0");
                             getSupportLoaderManager().initLoader(1, null, MineSubredditsActivity.this);
                         }

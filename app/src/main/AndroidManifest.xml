@@ -17,7 +17,9 @@
         android:configChanges="orientation"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name=".utils.Apptil"
+        >
 
         <meta-data
             android:name="com.google.android.gms.version"

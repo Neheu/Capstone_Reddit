@@ -146,8 +146,8 @@ public class ReadyItWidgetActivity extends AppCompatActivity implements GetRefre
                 List<GetSubredditsModel.Child> list = model.data.children;
                 if (list != null && list.size() > 0) {
                     for (GetSubredditsModel.Child data : list) {
-                        if (!dbHelper.isAlreadyInserted(data.data.id)) {
-                            ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
+                        if (!dbHelper.isAlreadyInserted(data.data.id,TABLE_SUBS_SUBREDDIT)) {
+                           // ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
                             dbHelper.insertSubSubreddits(data);
                         }
                     }

@@ -179,7 +179,7 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         boolean isMarked = false;
         ContentResolver mContentResolver = context.getContentResolver();
         String selection = ReadyItContract.ReadyitEntry._ID + " = " + id + " AND " + ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " =0";
-        ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
+       // ReadyitProvider.tableToProcess(TABLE_SUBS_SUBREDDIT);
         Cursor cursor = mContentResolver.query(ReadyItContract.ReadyitEntry.CONTENT_URI,
                 new String[]{ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER}, selection, null,
                 null);
@@ -194,12 +194,14 @@ public class RedyItSQLiteOpenHelper extends SQLiteOpenHelper {
         return isMarked;
     }
 
-    public boolean isAlreadyInserted(String id) {
+    public boolean isAlreadyInserted(String id,String tableName) {
+        String table[] = new String[1];
+        table[0]= tableName;
         boolean isMarked = false;
         ContentResolver mContentResolver = context.getContentResolver();
         String selection = ReadyItContract.ReadyitEntry._ID + " = '" + id + "'";
         Cursor cursor = mContentResolver.query(ReadyItContract.ReadyitEntry.CONTENT_URI,
-                new String[]{ReadyItContract.ReadyitEntry._ID, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER}, selection, null,
+                table, selection, null,
                 null);
 
         if (cursor.getCount() > 0) {

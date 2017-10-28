@@ -45,8 +45,7 @@ public class ReadyitProvider extends ContentProvider {
           For each kind of uri you may want to access, add the corresponding match with addURI.
           The two calls below add matches for the task directory and a single item by ID.
          */
-        uriMatcher.addURI(ReadyItContract.AUTHORITY, ReadyItContract.PATH_READYIT, REDDIT);
-
+        uriMatcher.addURI(ReadyItContract.AUTHORITY,ReadyItContract.PAT_MINE_READYIT,REDDIT);
         return uriMatcher;
     }
 
@@ -55,12 +54,13 @@ public class ReadyitProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         Cursor cursor;
         final SQLiteDatabase db = dBHelper.getReadableDatabase();
+        final String table = projection[0];
 
         switch (sUriMatcher.match(uri)) {
             case REDDIT: {
-                cursor = db.query(TABLE_NAME
+                cursor = db.query(table
                         ,
-                        projection,
+                        null,
                         selection,
                         selectionArgs,
                         null,

@@ -92,7 +92,6 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
         subredditId = intentData.subreddit_id;
 
         db = dbHelper.getWritableDatabase();
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
         adapter = new SubredditDetailListAdapter(this, this, this, rvList, subredditList);
 
         if (savedInstanceState != null) {
@@ -111,22 +110,22 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, HomePageActivity.this);
+        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = ReadyItContract.ReadyitEntry.CONTENT_URI;
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
-
-        return new CursorLoader(this, uri, null, ReadyItContract.ReadyitEntry.SUBREDDIT_ID + " ='" + subredditId + "'", null, null);
+        String []table = new String[1];
+        table[0] =DatabaseUtils.TABLE_DETAIL_SUBREDDIT;
+        return new CursorLoader(this, uri, table, ReadyItContract.ReadyitEntry.SUBREDDIT_ID + " ='" + subredditId + "'", null, null);
 
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         subredditList.clear();
-        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
+//        ReadyitProvider.tableToProcess(DatabaseUtils.TABLE_DETAIL_SUBREDDIT);
 
         if (loader.getId() == LOADER_ID)
             populateSubscribedRedditList(data);
@@ -137,7 +136,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null));
+       // loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null));
 
     }
 
