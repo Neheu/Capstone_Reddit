@@ -194,7 +194,6 @@ public class MineSubredditsActivity extends AppCompatActivity implements Subredd
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry.USER_IS_SUBSCRIBER + " ='1'", null, null));
 
     }
 

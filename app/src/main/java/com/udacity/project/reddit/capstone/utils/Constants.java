@@ -123,9 +123,6 @@ public class Constants {
         long savedTime = pref.getLong(PRERENCES_TOKEN_REFRESH_TIME, 0);
         if (savedTime == 0)
             return false;
-        else if (currentTime - savedTime > MAX_DURATION)
-            return true;
-        else
-            return false;
+        else return currentTime - savedTime > MAX_DURATION;
     }
 }

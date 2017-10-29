@@ -14,18 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.udacity.project.reddit.capstone.R;
 import com.udacity.project.reddit.capstone.activity.ReplyActivity;
-import com.udacity.project.reddit.capstone.activity.SubredditDetailActivity;
 import com.udacity.project.reddit.capstone.db.ReadyitProvider;
 import com.udacity.project.reddit.capstone.db.RedyItSQLiteOpenHelper;
-import com.udacity.project.reddit.capstone.model.GetCommentsModel;
-import com.udacity.project.reddit.capstone.model.GetDetailedSubredditListModel;
-import com.udacity.project.reddit.capstone.model.GetSubredditsModel;
 import com.udacity.project.reddit.capstone.model.SubredditListViewModel;
-import com.udacity.project.reddit.capstone.server.ApiClient;
 import com.udacity.project.reddit.capstone.server.ApiInterface;
 import com.udacity.project.reddit.capstone.server.GetRefreshedToken;
 import com.udacity.project.reddit.capstone.utils.Constants;
@@ -33,19 +26,12 @@ import com.udacity.project.reddit.capstone.utils.DatabaseUtils;
 import com.udacity.project.reddit.capstone.utils.OnLoadMoreListener;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Neha on 03-09-2017.

@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            storeFile file("D:/Nanodegree/Projects Github/Capstone_Reddit/android.keystore.jks")
+            storeFile file("$rootDir/android.keystore.jks")
             storePassword "password"
             keyAlias "androidKey"
             keyPassword "password"

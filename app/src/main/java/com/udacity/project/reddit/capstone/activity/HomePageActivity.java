@@ -52,7 +52,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HomePageActivity extends AppCompatActivity implements SubredditDetailListAdapter.onSubredditSelectListener, GetRefreshedToken, LoaderManager.LoaderCallbacks<Cursor> {
     private ApiInterface apiInterface;
     private Intent intent;
-    private String subredditUrl, detailName, subredditId;
+    private String subredditUrl;
+    private String subredditId;
     private int subscriberCount;
     @BindView(R.id.tv_subreddit_url)
     TextView tvSubredditUrl;
@@ -61,12 +62,10 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     @BindView(R.id.tv_detail_name)
     TextView tvDetailName;
     private RedyItSQLiteOpenHelper dbHelper;
-    private SQLiteDatabase db;
     @BindView(R.id.list_view)
     RecyclerView rvList;
     SubredditDetailListAdapter adapter;
     private ArrayList<SubredditListViewModel> subredditList = new ArrayList<>();
-    private SubscribeRedditsViewModel intentData;
     private int LOADER_ID = 201;
 
 
@@ -82,16 +81,15 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rvList.setLayoutManager(layoutManager);
 
-        intentData = intent.getExtras().getParcelable(getString(R.string.data));
+        SubscribeRedditsViewModel intentData = intent.getExtras().getParcelable(getString(R.string.data));
         subredditUrl = intentData.url;
         subscriberCount = intentData.subCount;
-        detailName = intentData.display_name;
+        String detailName = intentData.display_name;
         tvSubredditUrl.setText(subredditUrl);
         tvDetailName.setText(detailName);
         tvSubsCount.setText(String.valueOf(subscriberCount));
         subredditId = intentData.subreddit_id;
 
-        db = dbHelper.getWritableDatabase();
         adapter = new SubredditDetailListAdapter(this, this, this, rvList, subredditList);
 
         if (savedInstanceState != null) {
@@ -136,7 +134,6 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-       // loader.deliverResult(getContentResolver().query(ReadyItContract.ReadyitEntry.CONTENT_URI, null, ReadyItContract.ReadyitEntry._ID + " ='" + subredditId + "'", null, null));
 
     }
 
@@ -144,7 +141,7 @@ public class HomePageActivity extends AppCompatActivity implements SubredditDeta
 
         @Override
         protected Void doInBackground(Void... params) {
-            if (new NetworkUtils().isOnline(HomePageActivity.this))
+            if (NetworkUtils.isOnline(HomePageActivity.this))
                 Constants.refreshAccessToken(HomePageActivity.this, HomePageActivity.this, "detail_subreddit");
             return null;
         }
